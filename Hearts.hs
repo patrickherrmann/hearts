@@ -54,9 +54,13 @@ points (Card Queen Spades) = 13
 points (Card _ Hearts)     = 1
 points _                   = 0
 
+--Gets the scoreboard of a game
+scoreboard :: Game -> Scoreboard
+scoreboard (Game s _) = s
+
 --Gets the scoreboard ranked by score
 leaderboard :: Game -> Scoreboard
-leaderboard (Game s _) = sortBy (comparing snd) s
+leaderboard = sortBy (comparing snd) . scoreboard
 
 --Look at the cards in each pile and determine the points
 --Watch out for shooting the moon
@@ -68,5 +72,5 @@ score piles =
    where scores = map (sum . map points) piles
 
 --Check if the game is over
-over :: Scoreboard -> Bool
-over = any (>99) . map snd
+over :: Game -> Bool
+over = any (>99) . map snd . leaderboard
