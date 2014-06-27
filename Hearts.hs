@@ -46,6 +46,7 @@ type Scoreboard = [(Player, Score)]
 data Game = Game Scoreboard PassingPhase
 
 --Everybody starts with zero points
+newGame :: Game
 newGame = Game (zip [N .. W] $ repeat 0) PassLeft
 
 --Get the point worth of a card

@@ -26,16 +26,18 @@ data Suit = Clubs
 --Playing cards; no jokers
 data Card = Card Rank Suit
 
-instance Show Card where
-   show (Card r s) = (show r) ++ " of " ++ (show s)
-
---Provides a full deck
-fullDeck = [Card r s | r <- [Two .. Ace], s <- [Clubs .. Spades]]
-
 --Different names for a list of cards
 type Pile = [Card]
 type Deck = Pile
 type Hand = Pile
+
+--Provides a full deck
+fullDeck :: Deck
+fullDeck = [Card r s | r <- [Two .. Ace], s <- [Clubs .. Spades]]
+
+--Long name of a card
+instance Show Card where
+   show (Card r s) = (show r) ++ " of " ++ (show s)
 
 --Shorthand is an abridged string representation
 class Shorthand a where
