@@ -32,7 +32,6 @@ data RoundState = RoundState
   , hands        :: PMap [Card]
   , piles        :: PMap [Card]
   , heartsBroken :: Bool
-  , firstTrick   :: Bool
   } deriving (Show)
 
 playGame :: IO ()
@@ -68,12 +67,20 @@ initialRoundState hands = RoundState {
   leader = firstPlayer hands,
   hands = hands,
   piles = zip players $ repeat [],
-  heartsBroken = False,
-  firstTrick = True
+  heartsBroken = False
 }
 
 performPassing :: PassingPhase -> PMap [Card] -> IO (PMap [Card])
-performPassing phase hands = return hands
+performPassing Keep hands = return hands
+performPassing phase hands = do
+  selections <- mapM (selectPasses . snd) hands
+  let (passes, keeps) = unzip selections
+  let rotated = drop (passingPhaseShifts phase) $ cycle passes
+  let hands' = zip players $ zipWith (++) rotated keeps
+  return hands'
+
+selectPasses :: [Card] -> IO ([Card], [Card])
+selectPasses = return . splitAt 3
 
 playTricks :: RoundState -> IO RoundState
 playTricks rs = if roundOver rs
@@ -83,27 +90,11 @@ playTricks rs = if roundOver rs
 playTrick :: RoundState -> IO RoundState
 playTrick = return
 
-leftPlayer :: Player -> Player
-leftPlayer W = N
-leftPlayer p = succ p
-
-acrossPlayer :: Player -> Player
-acrossPlayer = leftPlayer . leftPlayer
-
-rightPlayer :: Player -> Player
-rightPlayer = acrossPlayer . leftPlayer
-
-getReceiver :: PassingPhase -> Player -> Player
-getReceiver PassLeft = leftPlayer
-getReceiver PassRight = rightPlayer
-getReceiver PassAcross = acrossPlayer
-getReceiver Keep = id
-
-getPasser :: PassingPhase -> Player -> Player
-getPasser PassLeft = rightPlayer
-getPasser PassRight = leftPlayer
-getPasser PassAcross = acrossPlayer
-getPasser Keep = id
+passingPhaseShifts :: PassingPhase -> Int
+passingPhaseShifts PassLeft = 3
+passingPhaseShifts PassAcross = 2
+passingPhaseShifts PassRight = 1
+passingPhaseShifts Keep = 0
 
 nextPassingPhase :: PassingPhase -> PassingPhase
 nextPassingPhase Keep = PassLeft
