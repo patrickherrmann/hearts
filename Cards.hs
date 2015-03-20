@@ -25,7 +25,9 @@ data Suit
   | Spades
    deriving (Show, Eq, Enum)
 
-data Card = Card Rank Suit
+data Card
+  = Card Rank Suit
+  deriving (Eq)
 
 fullDeck :: [Card]
 fullDeck = Card <$> [Two .. Ace] <*> [Clubs .. Spades]
