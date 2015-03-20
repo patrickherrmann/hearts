@@ -33,7 +33,7 @@ fullDeck :: [Card]
 fullDeck = Card <$> [Two .. Ace] <*> [Clubs .. Spades]
 
 instance Show Card where
-  show (Card r s) = (show r) ++ " of " ++ (show s)
+  show (Card r s) = show r ++ " of " ++ show s
 
 class Shorthand a where
   shorthand :: a -> String
@@ -53,4 +53,4 @@ instance Shorthand Suit where
   shorthand = take 1 . show
 
 instance Shorthand Card where
-  shorthand (Card r s) = (shorthand r) ++ (shorthand s)
+  shorthand (Card r s) = shorthand r ++ shorthand s

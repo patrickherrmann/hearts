@@ -7,7 +7,6 @@ import Cards
 import Control.Applicative
 import Data.Maybe
 import Text.Printf
-import Data.Text.Format
 import Data.Function
 
 type PMap a = [(Player, a)]
@@ -121,7 +120,7 @@ shuffledDeck = return fullDeck
 
 firstPlayer :: PMap [Card] -> Player
 firstPlayer hands = p
-  where deucebag (_, cs) = (Card Two Clubs) `elem` cs
+  where deucebag (_, cs) = Card Two Clubs `elem` cs
         Just (p, _) = find deucebag hands
 
 points :: Card -> Int
