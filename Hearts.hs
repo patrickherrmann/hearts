@@ -5,6 +5,10 @@ import Data.List.Split
 import Data.Ord
 import Cards
 import Control.Applicative
+import Data.Maybe
+import Text.Printf
+import Data.Text.Format
+import Data.Function
 
 type PMap a = [(Player, a)]
 
@@ -37,13 +41,19 @@ data RoundState = RoundState
 playGame :: IO ()
 playGame = do
   let gs = initialGameState
-  w <- playRounds gs
-  putStrLn $ show w ++ " wins!"
+  ws <- playRounds gs
+  putStrLn $ gameOverText ws
 
-playRounds :: GameState -> IO Player
-playRounds gs = case winner (scores gs) of
+gameOverText :: [Player] -> String
+gameOverText [a] = printf "%s wins!" (show a)
+gameOverText [a, b] = printf "%s and %s tie." (show a) (show b)
+gameOverText [a, b, c] = printf "%s, %s, and %s tie." (show a) (show b) (show c)
+gameOverText _ = "Everybody ties!"
+
+playRounds :: GameState -> IO [Player]
+playRounds gs = case winners (scores gs) of
   Nothing -> playRound gs >>= playRounds
-  Just w  -> return w
+  Just ws -> return ws
 
 initialGameState :: GameState
 initialGameState = GameState {
@@ -138,6 +148,10 @@ addScores a b = zip players $ map score' players
                        Just bScore = lookup p b
                    in aScore + bScore
 
-winner :: PMap Int -> Maybe Player
-winner = fmap fst . find wins
+winners :: PMap Int -> Maybe [Player]
+winners scores = listToMaybe ws
   where wins (_, s) = s >= 100
+        ws = map (map fst)
+           . groupBy ((==) `on` snd)
+           . sortBy (comparing (Down . snd))
+           $ filter wins scores
