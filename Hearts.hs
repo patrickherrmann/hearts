@@ -35,6 +35,23 @@ data RoundState = RoundState
   , firstTrick   :: Bool
   } deriving (Show)
 
+playGame :: IO ()
+playGame = do
+  let gs = initialGameState
+  w <- playRounds gs
+  putStrLn $ show w ++ " wins!"
+
+playRounds :: GameState -> IO Player
+playRounds gs = case winner (scores gs) of
+  Nothing -> playRound gs >>= playRounds
+  Just w  -> return w
+
+initialGameState :: GameState
+initialGameState = GameState {
+  passingPhase = PassLeft,
+  scores = zip players $ repeat 0
+}
+
 playRound :: GameState -> IO GameState
 playRound gs = do
   deck <- shuffledDeck
@@ -43,7 +60,7 @@ playRound gs = do
   let rs = initialRoundState hands'
   rs' <- playTricks rs
   let pp' = nextPassingPhase $ passingPhase gs
-  let scores' = scoreRound (piles rs')
+  let scores' = scoreRound $ piles rs'
   return $ GameState pp' scores'
 
 initialRoundState :: PMap [Card] -> RoundState
@@ -55,15 +72,13 @@ initialRoundState hands = RoundState {
   firstTrick = True
 }
 
-playTricks :: RoundState -> IO RoundState
-playTricks rs = do
-  rs' <- playTrick rs
-  if roundOver rs'
-    then return rs'
-    else playTricks rs'
-
 performPassing :: PassingPhase -> PMap [Card] -> IO (PMap [Card])
 performPassing phase hands = return hands
+
+playTricks :: RoundState -> IO RoundState
+playTricks rs = if roundOver rs
+  then playTrick rs >>= playTricks
+  else return rs
 
 playTrick :: RoundState -> IO RoundState
 playTrick = return
@@ -131,3 +146,7 @@ addScores a b = zip players $ map score' players
   where score' p = let Just aScore = lookup p a
                        Just bScore = lookup p b
                    in aScore + bScore
+
+winner :: PMap Int -> Maybe Player
+winner = fmap fst . find wins
+  where wins (_, s) = s >= 100
