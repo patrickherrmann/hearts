@@ -24,13 +24,15 @@ data PassingPhase
 
 data GameState = GameState
   { passingPhase :: PassingPhase
-  , scores :: PMap Int
+  , scores       :: PMap Int
   } deriving (Show)
 
 data RoundState = RoundState
-  { leader :: Player
-  , hands  :: PMap [Card]
-  , piles  :: PMap [Card]
+  { leader       :: Player
+  , hands        :: PMap [Card]
+  , piles        :: PMap [Card]
+  , heartsBroken :: Bool
+  , firstTrick   :: Bool
   } deriving (Show)
 
 playRound :: GameState -> IO GameState
@@ -38,12 +40,20 @@ playRound gs = do
   deck <- shuffledDeck
   let hands = deal deck
   hands' <- performPassing (passingPhase gs) hands
-  let emptyPiles = zip players $ repeat []
-  let rs = RoundState (firstPlayer hands') hands' emptyPiles
+  let rs = initialRoundState hands'
   rs' <- playTricks rs
   let pp' = nextPassingPhase $ passingPhase gs
   let scores' = scoreRound (piles rs')
   return $ GameState pp' scores'
+
+initialRoundState :: PMap [Card] -> RoundState
+initialRoundState hands = RoundState {
+  leader = firstPlayer hands,
+  hands = hands,
+  piles = zip players $ repeat [],
+  heartsBroken = False,
+  firstTrick = True
+}
 
 playTricks :: RoundState -> IO RoundState
 playTricks rs = do
