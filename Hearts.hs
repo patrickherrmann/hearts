@@ -68,9 +68,9 @@ initialGameState = GameState {
 playRound :: GameState -> IO GameState
 playRound gs = do
   deck <- shuffledDeck
-  let hands = deal deck
-  hands' <- performPassing (passingPhase gs) hands
-  let rs = initialRoundState hands'
+  let hs = deal deck
+  hs' <- performPassing (passingPhase gs) hs
+  let rs = initialRoundState hs'
   rs' <- playTricks rs
   return GameState {
     passingPhase = nextPassingPhase $ passingPhase gs,
@@ -78,9 +78,9 @@ playRound gs = do
   }
 
 initialRoundState :: PMap [Card] -> RoundState
-initialRoundState hands = RoundState {
-  leader = firstPlayer hands,
-  hands = hands,
+initialRoundState hs = RoundState {
+  leader = firstPlayer hs,
+  hands = hs,
   piles = M.fromList . zip players $ repeat [],
   heartsBroken = False
 }
@@ -98,9 +98,9 @@ selectPasses :: [Card] -> IO ([Card], [Card])
 selectPasses = return . splitAt 3
 
 playTricks :: RoundState -> IO RoundState
-playTricks rs = if roundOver rs
-  then playTrick rs >>= playTricks
-  else return rs
+playTricks rs
+  | roundOver rs = return rs
+  | otherwise = playTrick rs >>= playTricks
 
 playFirstTrick :: RoundState -> IO RoundState
 playFirstTrick = return
@@ -146,19 +146,18 @@ scoreRound :: PMap [Card] -> PMap Int
 scoreRound = adjustIfMoonShot . M.map (sum . map points)
 
 adjustIfMoonShot :: PMap Int -> PMap Int
-adjustIfMoonShot scores = if normal
-    then scores
-    else M.map newScore scores
-  where normal = M.null $ M.map (==26) scores
-        newScore s = if s == 26 then 0 else 26
+adjustIfMoonShot scores
+    |  M.null $ M.map (==26) scores = scores
+    | otherwise = M.map newScore scores
+  where newScore 26 = 0
+        newScore _  = 26
 
 addScores :: PMap Int -> PMap Int -> PMap Int
 addScores = M.unionWith (+)
 
 winners :: PMap Int -> Maybe [Player]
 winners scores = listToMaybe ws
-  where wins (_, s) = s >= 100
-        ws = map (map fst)
+  where ws = map (map fst)
            . groupBy ((==) `on` snd)
            . sortBy (comparing (Down . snd))
            . M.assocs
