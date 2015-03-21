@@ -37,6 +37,11 @@ data RoundState = RoundState
   , heartsBroken :: Bool
   } deriving (Show)
 
+data TrickState = TrickState
+  { suit :: Suit
+  , pot  :: PMap Card
+  }
+
 playGame :: IO ()
 playGame = do
   let gs = initialGameState
@@ -67,9 +72,10 @@ playRound gs = do
   hands' <- performPassing (passingPhase gs) hands
   let rs = initialRoundState hands'
   rs' <- playTricks rs
-  let pp' = nextPassingPhase $ passingPhase gs
-  let scores' = scoreRound $ piles rs'
-  return $ GameState pp' scores'
+  return $ GameState {
+    passingPhase = nextPassingPhase $ passingPhase gs,
+    scores = scoreRound $ piles rs'
+  }
 
 initialRoundState :: PMap [Card] -> RoundState
 initialRoundState hands = RoundState {
@@ -82,11 +88,11 @@ initialRoundState hands = RoundState {
 performPassing :: PassingPhase -> PMap [Card] -> IO (PMap [Card])
 performPassing Keep hands = return hands
 performPassing phase hands = do
-  selections <- mapM (selectPasses . snd) hands
+  let (ps, hs) = unzip hands
+  selections <- mapM selectPasses hs
   let (passes, keeps) = unzip selections
   let rotated = drop (passingPhaseShifts phase) $ cycle passes
-  let hands' = zip players $ zipWith (++) rotated keeps
-  return hands'
+  return . zip ps $ zipWith (++) rotated keeps
 
 selectPasses :: [Card] -> IO ([Card], [Card])
 selectPasses = return . splitAt 3
@@ -95,6 +101,9 @@ playTricks :: RoundState -> IO RoundState
 playTricks rs = if roundOver rs
   then playTrick rs >>= playTricks
   else return rs
+
+playFirstTrick :: RoundState -> IO RoundState
+playFirstTrick = return
 
 playTrick :: RoundState -> IO RoundState
 playTrick = return
@@ -112,16 +121,20 @@ nextPassingPhase pp   = succ pp
 players :: [Player]
 players = [N .. W]
 
-deal :: [Card] -> PMap [Card]
-deal = zip players . transpose . chunksOf 4
-
-shuffledDeck :: IO [Card]
-shuffledDeck = return fullDeck
+nextPlayer :: Player -> Player
+nextPlayer W = N
+nextPlayer p = succ p
 
 firstPlayer :: PMap [Card] -> Player
 firstPlayer hands = p
   where deucebag (_, cs) = Card Two Clubs `elem` cs
         Just (p, _) = find deucebag hands
+
+deal :: [Card] -> PMap [Card]
+deal = zip players . transpose . chunksOf 4
+
+shuffledDeck :: IO [Card]
+shuffledDeck = return fullDeck
 
 points :: Card -> Int
 points (Card Queen Spades) = 13
@@ -143,9 +156,10 @@ adjustIfMoonShot scores = case shooter of
 
 addScores :: PMap Int -> PMap Int -> PMap Int
 addScores a b = zip players $ map score' players
-  where score' p = let Just aScore = lookup p a
-                       Just bScore = lookup p b
-                   in aScore + bScore
+  where score' p = fromJust $ do
+          a' <- lookup p a
+          b' <- lookup p b
+          return $ a' + b'
 
 winners :: PMap Int -> Maybe [Player]
 winners scores = listToMaybe ws
