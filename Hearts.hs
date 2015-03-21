@@ -74,7 +74,7 @@ playRound gs = do
   rs' <- playTricks rs
   return GameState {
     passingPhase = nextPassingPhase $ passingPhase gs,
-    scores = scoreRound $ piles rs'
+    scores = M.unionWith (+) (scores gs) (scoreRound $ piles rs')
   }
 
 initialRoundState :: PMap [Card] -> RoundState
@@ -151,9 +151,6 @@ adjustIfMoonShot scores
     | otherwise = M.map newScore scores
   where newScore 26 = 0
         newScore _  = 26
-
-addScores :: PMap Int -> PMap Int -> PMap Int
-addScores = M.unionWith (+)
 
 winners :: PMap Int -> Maybe [Player]
 winners scores = listToMaybe ws
