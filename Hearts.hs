@@ -8,15 +8,16 @@ import Control.Applicative
 import Data.Maybe
 import Text.Printf
 import Data.Function
+import qualified Data.Map as M
 
-type PMap a = [(Player, a)]
+type PMap a = M.Map Player a
 
 data Player
   = N
   | E
   | S
   | W
-  deriving (Show, Eq, Enum)
+  deriving (Show, Eq, Enum, Ord)
 
 data PassingPhase
   = PassLeft
@@ -38,8 +39,8 @@ data RoundState = RoundState
   } deriving (Show)
 
 data TrickState = TrickState
-  { suit :: Suit
-  , pot  :: PMap Card
+  { suit         :: Suit
+  , pot          :: PMap Card
   }
 
 playGame :: IO ()
@@ -61,7 +62,7 @@ playRounds gs = maybe recurse return $ winners (scores gs)
 initialGameState :: GameState
 initialGameState = GameState {
   passingPhase = PassLeft,
-  scores = zip players $ repeat 0
+  scores = M.fromList . zip players $ repeat 0
 }
 
 playRound :: GameState -> IO GameState
@@ -80,18 +81,18 @@ initialRoundState :: PMap [Card] -> RoundState
 initialRoundState hands = RoundState {
   leader = firstPlayer hands,
   hands = hands,
-  piles = zip players $ repeat [],
+  piles = M.fromList . zip players $ repeat [],
   heartsBroken = False
 }
 
 performPassing :: PassingPhase -> PMap [Card] -> IO (PMap [Card])
 performPassing Keep hands = return hands
 performPassing phase hands = do
-  let (ps, hs) = unzip hands
+  let (ps, hs) = unzip $ M.assocs hands
   selections <- mapM selectPasses hs
   let (passes, keeps) = unzip selections
   let rotated = drop (passingPhaseShifts phase) $ cycle passes
-  return . zip ps $ zipWith (++) rotated keeps
+  return . M.fromList . zip ps $ zipWith (++) rotated keeps
 
 selectPasses :: [Card] -> IO ([Card], [Card])
 selectPasses = return . splitAt 3
@@ -125,12 +126,10 @@ nextPlayer W = N
 nextPlayer p = succ p
 
 firstPlayer :: PMap [Card] -> Player
-firstPlayer hands = p
-  where deucebag (_, cs) = Card Two Clubs `elem` cs
-        Just (p, _) = find deucebag hands
+firstPlayer = head . M.keys . M.filter (Card Two Clubs `elem`)
 
 deal :: [Card] -> PMap [Card]
-deal = zip players . transpose . chunksOf 4
+deal = M.fromList . zip players . transpose . chunksOf 4
 
 shuffledDeck :: IO [Card]
 shuffledDeck = return fullDeck
@@ -141,24 +140,20 @@ points (Card _ Hearts)     = 1
 points _                   = 0
 
 roundOver :: RoundState -> Bool
-roundOver = null . snd . head . hands
+roundOver = any null . M.elems . hands
 
 scoreRound :: PMap [Card] -> PMap Int
-scoreRound = adjustIfMoonShot . map (fmap $ sum . map points)
+scoreRound = adjustIfMoonShot . M.map (sum . map points)
 
 adjustIfMoonShot :: PMap Int -> PMap Int
-adjustIfMoonShot scores = case shooter of
-    Nothing -> scores
-    Just (p, _) -> zip players $ map (newScore p) players
-  where shooter = find ((==26) . snd) scores
-        newScore p p' = if p == p' then 0 else 26
+adjustIfMoonShot scores = if normal
+    then scores
+    else M.map newScore scores
+  where normal = M.null $ M.map (==26) scores
+        newScore s = if s == 26 then 0 else 26
 
 addScores :: PMap Int -> PMap Int -> PMap Int
-addScores a b = zip players $ map score' players
-  where score' p = fromJust $ do
-          a' <- lookup p a
-          b' <- lookup p b
-          return $ a' + b'
+addScores = M.unionWith (+)
 
 winners :: PMap Int -> Maybe [Player]
 winners scores = listToMaybe ws
@@ -166,4 +161,5 @@ winners scores = listToMaybe ws
         ws = map (map fst)
            . groupBy ((==) `on` snd)
            . sortBy (comparing (Down . snd))
-           $ filter wins scores
+           . M.assocs
+           $ M.filter (>= 100) scores
