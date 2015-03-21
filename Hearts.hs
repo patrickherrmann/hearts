@@ -55,9 +55,8 @@ gameOverText [a, b, c] = printf "%s, %s, and %s tie." (show a) (show b) (show c)
 gameOverText _ = "Everybody ties!"
 
 playRounds :: GameState -> IO [Player]
-playRounds gs = case winners (scores gs) of
-  Nothing -> playRound gs >>= playRounds
-  Just ws -> return ws
+playRounds gs = maybe recurse return $ winners (scores gs)
+  where recurse = playRound gs >>= playRounds
 
 initialGameState :: GameState
 initialGameState = GameState {
@@ -72,7 +71,7 @@ playRound gs = do
   hands' <- performPassing (passingPhase gs) hands
   let rs = initialRoundState hands'
   rs' <- playTricks rs
-  return $ GameState {
+  return GameState {
     passingPhase = nextPassingPhase $ passingPhase gs,
     scores = scoreRound $ piles rs'
   }
