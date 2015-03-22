@@ -33,15 +33,12 @@ data GameState = GameState
 
 data RoundState = RoundState
   { leader       :: Player
+  , leadSuit     :: Suit
   , hands        :: PMap [Card]
   , piles        :: PMap [Card]
+  , pot          :: PMap Card
   , heartsBroken :: Bool
   } deriving (Show)
-
-data TrickState = TrickState
-  { suit         :: Suit
-  , pot          :: PMap Card
-  }
 
 playGame :: IO ()
 playGame = do
@@ -56,8 +53,9 @@ gameOverText [a, b, c] = printf "%s, %s, and %s tie." (show a) (show b) (show c)
 gameOverText _ = "Everybody ties!"
 
 playRounds :: GameState -> IO [Player]
-playRounds gs = maybe recurse return $ winners (scores gs)
-  where recurse = playRound gs >>= playRounds
+playRounds gs
+  | gameOver (scores gs) = return . winners $ scores gs
+  | otherwise = playRound gs >>= playRounds
 
 initialGameState :: GameState
 initialGameState = GameState {
@@ -80,8 +78,10 @@ playRound gs = do
 initialRoundState :: PMap [Card] -> RoundState
 initialRoundState hs = RoundState {
   leader = firstPlayer hs,
+  leadSuit = Clubs,
   hands = hs,
   piles = M.fromList . zip players $ repeat [],
+  pot = M.empty,
   heartsBroken = False
 }
 
@@ -103,10 +103,45 @@ playTricks rs
   | otherwise = playTrick rs >>= playTricks
 
 playFirstTrick :: RoundState -> IO RoundState
-playFirstTrick = return
+playFirstTrick rs = do
+  let rs' = unsafePlayCard rs (leader rs) (Card Two Clubs)
+  return rs'
+
+playCardFirstTrick :: RoundState -> Player -> IO RoundState
+playCardFirstTrick rs p = do
+  let h = hands rs M.! p
+  card <- selectPlay p h
+  let vs = validFirstTrickPlays rs h
+  if card `elem` vs
+    then return $ unsafePlayCard rs p card
+    else playCardFirstTrick rs p
+
+
+
+validPlays :: RoundState -> [Card] -> [Card]
+validPlays rs cs
+    | not . null $ ofLeadSuit = ofLeadSuit
+    | otherwise = cs
+  where ofLeadSuit = filter ((==(leadSuit rs)) . suit) cs
+
+validFirstTrickPlays :: RoundState -> [Card] -> [Card]
+validFirstTrickPlays rs cs
+    | null opts = valid
+  where notBloody = (==0) . points
+        opts = filter notBloody valid
+        valid = validPlays rs cs
+
+selectPlay :: Player -> [Card] -> IO Card
+selectPlay p hand = return $ head hand
 
 playTrick :: RoundState -> IO RoundState
 playTrick = return
+
+unsafePlayCard :: RoundState -> Player -> Card -> RoundState
+unsafePlayCard rs p c = rs {
+  pot = M.singleton p c,
+  hands = M.adjust (\\ [c]) (leader rs) (hands rs)
+}
 
 passingPhaseShifts :: PassingPhase -> Int
 passingPhaseShifts PassLeft = 3
@@ -152,10 +187,12 @@ adjustIfMoonShot scores
   where newScore 26 = 0
         newScore _  = 26
 
-winners :: PMap Int -> Maybe [Player]
-winners scores = listToMaybe ws
-  where ws = map (map fst)
-           . groupBy ((==) `on` snd)
-           . sortBy (comparing (Down . snd))
-           . M.assocs
-           $ M.filter (>= 100) scores
+winners :: PMap Int -> [Player]
+winners = map fst
+        . head
+        . groupBy ((==) `on` snd)
+        . sortBy (comparing snd)
+        . M.assocs
+
+gameOver :: PMap Int -> Bool
+gameOver = not . M.null . M.filter (>= 100)
