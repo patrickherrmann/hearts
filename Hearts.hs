@@ -9,6 +9,7 @@ import Data.Maybe
 import Text.Printf
 import Data.Function
 import qualified Data.Map as M
+import qualified Data.Traversable as T
 
 type PMap a = M.Map Player a
 
@@ -88,14 +89,14 @@ initialRoundState hs = RoundState {
 performPassing :: PassingPhase -> PMap [Card] -> IO (PMap [Card])
 performPassing Keep hands = return hands
 performPassing phase hands = do
-  let (ps, hs) = unzip $ M.assocs hands
-  selections <- mapM selectPasses hs
-  let (passes, keeps) = unzip selections
-  let rotated = drop (passingPhaseShifts phase) $ cycle passes
-  return . M.fromList . zip ps $ zipWith (++) rotated keeps
+  selections <- T.sequence $ M.mapWithKey selectPasses hands
+  let passes = M.map fst selections
+  let keeps = M.map snd selections
+  let shifted = M.mapKeys (passingTarget phase) passes
+  return $ M.unionWith (++) shifted keeps
 
-selectPasses :: [Card] -> IO ([Card], [Card])
-selectPasses = return . splitAt 3
+selectPasses :: Player -> [Card] -> IO ([Card], [Card])
+selectPasses p cs = return $ splitAt 3 cs
 
 playTricks :: RoundState -> IO RoundState
 playTricks rs
@@ -143,11 +144,11 @@ unsafePlayCard rs p c = rs {
   hands = M.adjust (\\ [c]) (leader rs) (hands rs)
 }
 
-passingPhaseShifts :: PassingPhase -> Int
-passingPhaseShifts PassLeft = 3
-passingPhaseShifts PassAcross = 2
-passingPhaseShifts PassRight = 1
-passingPhaseShifts Keep = 0
+passingTarget :: PassingPhase -> Player -> Player
+passingTarget Keep = id
+passingTarget PassLeft = nextPlayer
+passingTarget PassAcross = nextPlayer . nextPlayer
+passingTarget PassRight = nextPlayer . nextPlayer . nextPlayer
 
 nextPassingPhase :: PassingPhase -> PassingPhase
 nextPassingPhase Keep = PassLeft
