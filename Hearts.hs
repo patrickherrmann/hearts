@@ -10,6 +10,7 @@ import Text.Printf
 import Data.Function
 import qualified Data.Map as M
 import qualified Data.Traversable as T
+import qualified Data.Foldable as F
 
 type PMap a = M.Map Player a
 
@@ -33,7 +34,7 @@ data GameState = GameState
   } deriving (Show)
 
 data RoundState = RoundState
-  { leader       :: Player
+  { toPlay       :: Player
   , leadSuit     :: Suit
   , hands        :: PMap [Card]
   , piles        :: PMap [Card]
@@ -70,15 +71,16 @@ playRound gs = do
   let hs = deal deck
   hs' <- performPassing (passingPhase gs) hs
   let rs = initialRoundState hs'
-  rs' <- playTricks rs
+  rs' <- playFirstTrick rs
+  rs'' <- playTricks rs'
   return GameState {
     passingPhase = nextPassingPhase $ passingPhase gs,
-    scores = M.unionWith (+) (scores gs) (scoreRound $ piles rs')
+    scores = M.unionWith (+) (scores gs) (scoreRound $ piles rs'')
   }
 
 initialRoundState :: PMap [Card] -> RoundState
 initialRoundState hs = RoundState {
-  leader = firstPlayer hs,
+  toPlay = firstPlayer hs,
   leadSuit = Clubs,
   hands = hs,
   piles = M.fromList . zip players $ repeat [],
@@ -105,29 +107,46 @@ playTricks rs
 
 playFirstTrick :: RoundState -> IO RoundState
 playFirstTrick rs = do
-  let rs' = unsafePlayCard rs (leader rs) (Card Two Clubs)
-  return rs'
+  let rs1 = unsafePlayCard rs (toPlay rs) (Card Two Clubs)
+  rs2 <- playCardFirstTrick rs1
+  rs3 <- playCardFirstTrick rs2
+  rs4 <- playCardFirstTrick rs3
+  return rs4
 
-playCardFirstTrick :: RoundState -> Player -> IO RoundState
-playCardFirstTrick rs p = do
+collectTrick :: RoundState -> RoundState
+collectTrick rs = rs {
+    toPlay = w,
+    pot = M.empty,
+    piles = M.adjust (++ M.elems (pot rs)) w (piles rs)
+  }
+  where w = trickWinner rs
+
+trickWinner :: RoundState -> Player
+trickWinner rs = fst
+               . maximumBy (comparing (rank . snd))
+               . filter ((== leadSuit rs) . suit . snd)
+               $ M.assocs (pot rs)
+
+playCardFirstTrick :: RoundState -> IO RoundState
+playCardFirstTrick rs = do
+  let p = toPlay rs
   let h = hands rs M.! p
   card <- selectPlay p h
   let vs = validFirstTrickPlays rs h
   if card `elem` vs
     then return $ unsafePlayCard rs p card
-    else playCardFirstTrick rs p
-
-
+    else playCardFirstTrick rs
 
 validPlays :: RoundState -> [Card] -> [Card]
 validPlays rs cs
-    | not . null $ ofLeadSuit = ofLeadSuit
-    | otherwise = cs
+    | null ofLeadSuit = cs
+    | otherwise = ofLeadSuit
   where ofLeadSuit = filter ((==(leadSuit rs)) . suit) cs
 
 validFirstTrickPlays :: RoundState -> [Card] -> [Card]
 validFirstTrickPlays rs cs
     | null opts = valid
+    | otherwise = opts
   where notBloody = (==0) . points
         opts = filter notBloody valid
         valid = validPlays rs cs
@@ -138,10 +157,25 @@ selectPlay p hand = return $ head hand
 playTrick :: RoundState -> IO RoundState
 playTrick = return
 
+playLeadCard :: RoundState -> IO RoundState
+playLeadCard = return
+
+playCard :: RoundState -> IO RoundState
+playCard rs = do
+  let p = toPlay rs
+  let h = hands rs M.! p
+  card <- selectPlay p h
+  let vs = validPlays rs h
+  if card `elem` vs
+    then return $ unsafePlayCard rs p card
+    else playCard rs
+
 unsafePlayCard :: RoundState -> Player -> Card -> RoundState
 unsafePlayCard rs p c = rs {
-  pot = M.singleton p c,
-  hands = M.adjust (\\ [c]) (leader rs) (hands rs)
+  pot = M.insert p c (pot rs),
+  hands = M.adjust (\\ [c]) p (hands rs),
+  toPlay = nextPlayer p,
+  heartsBroken = (heartsBroken rs) || (suit c == Hearts)
 }
 
 passingTarget :: PassingPhase -> Player -> Player
@@ -176,7 +210,7 @@ points (Card _ Hearts)     = 1
 points _                   = 0
 
 roundOver :: RoundState -> Bool
-roundOver = any null . M.elems . hands
+roundOver = F.any null . hands
 
 scoreRound :: PMap [Card] -> PMap Int
 scoreRound = adjustIfMoonShot . M.map (sum . map points)
@@ -196,4 +230,4 @@ winners = map fst
         . M.assocs
 
 gameOver :: PMap Int -> Bool
-gameOver = not . M.null . M.filter (>= 100)
+gameOver = F.any (>= 100)
