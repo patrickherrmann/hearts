@@ -108,10 +108,10 @@ playTricks rs
 playFirstTrick :: RoundState -> IO RoundState
 playFirstTrick rs = do
   let rs1 = unsafePlayCard rs (toPlay rs) (Card Two Clubs)
-  rs2 <- playCardFirstTrick rs1
-  rs3 <- playCardFirstTrick rs2
-  rs4 <- playCardFirstTrick rs3
-  return rs4
+  rs2 <- playCard rs1 validFirstTrickPlays
+  rs3 <- playCard rs2 validFirstTrickPlays
+  rs4 <- playCard rs3 validFirstTrickPlays
+  return $ collectTrick rs4
 
 collectTrick :: RoundState -> RoundState
 collectTrick rs = rs {
@@ -126,16 +126,6 @@ trickWinner rs = fst
                . maximumBy (comparing (rank . snd))
                . filter ((== leadSuit rs) . suit . snd)
                $ M.assocs (pot rs)
-
-playCardFirstTrick :: RoundState -> IO RoundState
-playCardFirstTrick rs = do
-  let p = toPlay rs
-  let h = hands rs M.! p
-  card <- selectPlay p h
-  let vs = validFirstTrickPlays rs h
-  if card `elem` vs
-    then return $ unsafePlayCard rs p card
-    else playCardFirstTrick rs
 
 validPlays :: RoundState -> [Card] -> [Card]
 validPlays rs cs
@@ -155,20 +145,27 @@ selectPlay :: Player -> [Card] -> IO Card
 selectPlay p hand = return $ head hand
 
 playTrick :: RoundState -> IO RoundState
-playTrick = return
+playTrick rs = do
+  rs1 <- playCard rs validLeadCards
+  rs2 <- playCard rs1 validPlays
+  rs3 <- playCard rs2 validPlays
+  rs4 <- playCard rs3 validPlays
+  return $ collectTrick rs4
 
-playLeadCard :: RoundState -> IO RoundState
-playLeadCard = return
+validLeadCards :: RoundState -> [Card] -> [Card]
+validLeadCards rs cs
+  | heartsBroken rs = cs
+  | otherwise = filter ((/= Hearts) . suit) cs
 
-playCard :: RoundState -> IO RoundState
-playCard rs = do
+playCard :: RoundState -> (RoundState -> [Card] -> [Card]) -> IO RoundState
+playCard rs valid = do
   let p = toPlay rs
   let h = hands rs M.! p
   card <- selectPlay p h
-  let vs = validPlays rs h
+  let vs = valid rs h
   if card `elem` vs
     then return $ unsafePlayCard rs p card
-    else playCard rs
+    else playCard rs valid
 
 unsafePlayCard :: RoundState -> Player -> Card -> RoundState
 unsafePlayCard rs p c = rs {
