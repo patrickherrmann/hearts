@@ -131,7 +131,7 @@ validPlays :: RoundState -> [Card] -> [Card]
 validPlays rs cs
     | null ofLeadSuit = cs
     | otherwise = ofLeadSuit
-  where ofLeadSuit = filter ((==(leadSuit rs)) . suit) cs
+  where ofLeadSuit = filter ((== leadSuit rs) . suit) cs
 
 validFirstTrickPlays :: RoundState -> [Card] -> [Card]
 validFirstTrickPlays rs cs
@@ -172,7 +172,7 @@ unsafePlayCard rs p c = rs {
   pot = M.insert p c (pot rs),
   hands = M.adjust (\\ [c]) p (hands rs),
   toPlay = nextPlayer p,
-  heartsBroken = (heartsBroken rs) || (suit c == Hearts)
+  heartsBroken = heartsBroken rs || (suit c == Hearts)
 }
 
 passingTarget :: PassingPhase -> Player -> Player

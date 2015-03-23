@@ -1,6 +1,8 @@
 module Cards where
 
 import Control.Applicative
+import Data.List
+import Data.List.Split
 
 data Rank
   = Two
@@ -55,3 +57,16 @@ instance Shorthand Suit where
 
 instance Shorthand Card where
   shorthand (Card r s) = shorthand r ++ shorthand s
+
+unicode :: String
+unicode = "🃒🃓🃔🃕🃖🃗🃘🃙🃚🃛🃝🃞🃑\
+          \🃂🃃🃄🃅🃆🃇🃈🃉🃊🃋🃍🃎🃁\
+          \🂲🂳🂴🂵🂶🂷🂸🂹🂺🂻🂽🂾🂱\
+          \🂢🂣🂤🂥🂦🂧🂨🂩🂪🂫🂭🂮🂡"
+
+unicodeMapping :: [(Card, Char)]
+unicodeMapping = zip fullDeck (concat . transpose . chunksOf 13 $ unicode)
+
+showUnicode :: Card -> String
+showUnicode c = [u]
+  where Just u = lookup c unicodeMapping
