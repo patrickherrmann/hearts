@@ -4,8 +4,6 @@ import Data.List
 import Data.List.Split
 import Data.Ord
 import Cards
-import Control.Applicative
-import Data.Maybe
 import Data.Function
 import qualified Data.Map as M
 import qualified Data.Traversable as T
@@ -100,9 +98,9 @@ initialRoundState hs = RoundState {
 }
 
 performPassing :: GameIO -> PassingPhase -> PMap [Card] -> IO (PMap [Card])
-performPassing _ Keep hands = return hands
-performPassing gio phase hands = do
-  selections <- T.sequence $ M.mapWithKey (selectPasses gio) hands
+performPassing _ Keep hs = return hs
+performPassing gio phase hs = do
+  selections <- T.sequence $ M.mapWithKey (selectPasses gio) hs
   let passes = M.map fst selections
   let keeps = M.map snd selections
   let shifted = M.mapKeys (passingTarget phase) passes

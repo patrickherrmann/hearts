@@ -34,6 +34,7 @@ firstThreeCards (a:b:c:_) = return (a, b, c)
 randomCardSelection :: [Card] -> IO Card
 randomCardSelection = sample . choice
 
+main :: IO ()
 main = do
   let pio = PlayerIO {
     getPassSelections = firstThreeCards,
