@@ -132,6 +132,44 @@ playFirstTrick gio rs = do
   showRoundState gio rs4
   return $ collectTrick rs4
 
+selectPlay :: GameIO -> Player -> [Card] -> IO Card
+selectPlay gio p hand = do
+  let pio = playerIO gio M.! p
+  getSelectedCard pio hand
+
+playTrick :: GameIO -> RoundState -> IO RoundState
+playTrick gio rs = do
+  rs1 <- playCard gio rs validLeadCards
+  let rs1' = rs1 {
+    leadSuit = suit . head . M.elems $ pot rs1
+  }
+  showRoundState gio rs1'
+  rs2 <- playCard gio rs1' validPlays
+  showRoundState gio rs2
+  rs3 <- playCard gio rs2 validPlays
+  showRoundState gio rs3
+  rs4 <- playCard gio rs3 validPlays
+  showRoundState gio rs4
+  return $ collectTrick rs4
+
+playCard :: GameIO -> RoundState -> (RoundState -> [Card] -> [Card]) -> IO RoundState
+playCard gio rs valid = do
+  let p = toPlay rs
+  let h = hands rs M.! p
+  card <- selectPlay gio p h
+  let vs = valid rs h
+  if card `elem` vs
+    then return $ unsafePlayCard rs p card
+    else playCard gio rs valid
+
+unsafePlayCard :: RoundState -> Player -> Card -> RoundState
+unsafePlayCard rs p c = rs {
+  pot = M.insert p c (pot rs),
+  hands = M.adjust (\\ [c]) p (hands rs),
+  toPlay = nextPlayer p,
+  heartsBroken = heartsBroken rs || (suit c == Hearts)
+}
+
 collectTrick :: RoundState -> RoundState
 collectTrick rs = rs {
     toPlay = w,
@@ -160,48 +198,10 @@ validFirstTrickPlays rs cs
         opts = filter notBloody valid
         valid = validPlays rs cs
 
-selectPlay :: GameIO -> Player -> [Card] -> IO Card
-selectPlay gio p hand = do
-  let pio = playerIO gio M.! p
-  getSelectedCard pio hand
-
-playTrick :: GameIO -> RoundState -> IO RoundState
-playTrick gio rs = do
-  rs1 <- playCard gio rs validLeadCards
-  let rs1' = rs1 {
-    leadSuit = suit . head . M.elems $ pot rs1
-  }
-  showRoundState gio rs1'
-  rs2 <- playCard gio rs1' validPlays
-  showRoundState gio rs2
-  rs3 <- playCard gio rs2 validPlays
-  showRoundState gio rs3
-  rs4 <- playCard gio rs3 validPlays
-  showRoundState gio rs4
-  return $ collectTrick rs4
-
 validLeadCards :: RoundState -> [Card] -> [Card]
 validLeadCards rs cs
   | heartsBroken rs = cs
   | otherwise = filter ((/= Hearts) . suit) cs
-
-playCard :: GameIO -> RoundState -> (RoundState -> [Card] -> [Card]) -> IO RoundState
-playCard gio rs valid = do
-  let p = toPlay rs
-  let h = hands rs M.! p
-  card <- selectPlay gio p h
-  let vs = valid rs h
-  if card `elem` vs
-    then return $ unsafePlayCard rs p card
-    else playCard gio rs valid
-
-unsafePlayCard :: RoundState -> Player -> Card -> RoundState
-unsafePlayCard rs p c = rs {
-  pot = M.insert p c (pot rs),
-  hands = M.adjust (\\ [c]) p (hands rs),
-  toPlay = nextPlayer p,
-  heartsBroken = heartsBroken rs || (suit c == Hearts)
-}
 
 passingTarget :: PassingPhase -> Player -> Player
 passingTarget Keep = id
