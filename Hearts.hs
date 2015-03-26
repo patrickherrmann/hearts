@@ -6,7 +6,6 @@ import Data.Ord
 import Cards
 import Control.Applicative
 import Data.Maybe
-import Text.Printf
 import Data.Function
 import qualified Data.Map as M
 import qualified Data.Traversable as T
@@ -15,6 +14,19 @@ import Control.Monad.Random
 import System.Random.Shuffle
 
 type PMap a = M.Map Player a
+
+data GameIO = GameIO
+  { showPreRound      :: GameState -> IO ()
+  , showRoundState    :: RoundState -> IO ()
+  , showPostRound     :: RoundState -> IO ()
+  , showPostGame      :: [Player] -> IO ()
+  , playerIO          :: PMap PlayerIO
+  }
+
+data PlayerIO = PlayerIO
+  { getPassSelections :: [Card] -> IO (Card, Card, Card)
+  , getSelectedCard   :: [Card] -> IO Card
+  }
 
 data Player
   = N
@@ -44,22 +56,18 @@ data RoundState = RoundState
   , heartsBroken :: Bool
   } deriving (Show)
 
-playGame :: IO ()
-playGame = do
+playGame :: GameIO -> IO ()
+playGame gio = do
   let gs = initialGameState
-  ws <- playRounds gs
-  putStrLn $ gameOverText ws
+  ws <- playRounds gio gs
+  (showPostGame gio) ws
 
-gameOverText :: [Player] -> String
-gameOverText [a] = printf "%s wins!" (show a)
-gameOverText [a, b] = printf "%s and %s tie." (show a) (show b)
-gameOverText [a, b, c] = printf "%s, %s, and %s tie." (show a) (show b) (show c)
-gameOverText _ = "Everybody ties!"
-
-playRounds :: GameState -> IO [Player]
-playRounds gs
+playRounds :: GameIO -> GameState -> IO [Player]
+playRounds gio gs
   | gameOver (scores gs) = return . winners $ scores gs
-  | otherwise = playRound gs >>= playRounds
+  | otherwise = do
+    (showPreRound gio) gs
+    playRound gio gs >>= playRounds gio
 
 initialGameState :: GameState
 initialGameState = GameState {
@@ -67,14 +75,14 @@ initialGameState = GameState {
   scores = M.fromList . zip players $ repeat 0
 }
 
-playRound :: GameState -> IO GameState
-playRound gs = do
+playRound :: GameIO -> GameState -> IO GameState
+playRound gio gs = do
   deck <- shuffledDeck
   let hs = deal deck
-  hs' <- performPassing (passingPhase gs) hs
+  hs' <- performPassing gio (passingPhase gs) hs
   let rs = initialRoundState hs'
-  rs' <- playFirstTrick rs
-  rs'' <- playTricks rs'
+  rs' <- playFirstTrick gio rs
+  rs'' <- playTricks gio rs'
   return GameState {
     passingPhase = nextPassingPhase $ passingPhase gs,
     scores = M.unionWith (+) (scores gs) (scoreRound $ piles rs'')
@@ -90,29 +98,29 @@ initialRoundState hs = RoundState {
   heartsBroken = False
 }
 
-performPassing :: PassingPhase -> PMap [Card] -> IO (PMap [Card])
-performPassing Keep hands = return hands
-performPassing phase hands = do
-  selections <- T.sequence $ M.mapWithKey selectPasses hands
+performPassing :: GameIO -> PassingPhase -> PMap [Card] -> IO (PMap [Card])
+performPassing _ Keep hands = return hands
+performPassing gio phase hands = do
+  selections <- T.sequence $ M.mapWithKey (selectPasses gio) hands
   let passes = M.map fst selections
   let keeps = M.map snd selections
   let shifted = M.mapKeys (passingTarget phase) passes
   return $ M.unionWith (++) shifted keeps
 
-selectPasses :: Player -> [Card] -> IO ([Card], [Card])
-selectPasses p cs = return $ splitAt 3 cs
+selectPasses :: GameIO -> Player -> [Card] -> IO ([Card], [Card])
+selectPasses gio p cs = return $ splitAt 3 cs
 
-playTricks :: RoundState -> IO RoundState
-playTricks rs
+playTricks :: GameIO -> RoundState -> IO RoundState
+playTricks gio rs
   | roundOver rs = return rs
-  | otherwise = playTrick rs >>= playTricks
+  | otherwise = playTrick gio rs >>= playTricks gio
 
-playFirstTrick :: RoundState -> IO RoundState
-playFirstTrick rs = do
+playFirstTrick :: GameIO -> RoundState -> IO RoundState
+playFirstTrick gio rs = do
   let rs1 = unsafePlayCard rs (toPlay rs) (Card Two Clubs)
-  rs2 <- playCard rs1 validFirstTrickPlays
-  rs3 <- playCard rs2 validFirstTrickPlays
-  rs4 <- playCard rs3 validFirstTrickPlays
+  rs2 <- playCard gio rs1 validFirstTrickPlays
+  rs3 <- playCard gio rs2 validFirstTrickPlays
+  rs4 <- playCard gio rs3 validFirstTrickPlays
   return $ collectTrick rs4
 
 collectTrick :: RoundState -> RoundState
@@ -143,15 +151,15 @@ validFirstTrickPlays rs cs
         opts = filter notBloody valid
         valid = validPlays rs cs
 
-selectPlay :: Player -> [Card] -> IO Card
-selectPlay p hand = return $ head hand
+selectPlay :: GameIO -> Player -> [Card] -> IO Card
+selectPlay gio p hand = return $ head hand
 
-playTrick :: RoundState -> IO RoundState
-playTrick rs = do
-  rs1 <- playCard rs validLeadCards
-  rs2 <- playCard rs1 validPlays
-  rs3 <- playCard rs2 validPlays
-  rs4 <- playCard rs3 validPlays
+playTrick :: GameIO -> RoundState -> IO RoundState
+playTrick gio rs = do
+  rs1 <- playCard gio rs validLeadCards
+  rs2 <- playCard gio rs1 validPlays
+  rs3 <- playCard gio rs2 validPlays
+  rs4 <- playCard gio rs3 validPlays
   return $ collectTrick rs4
 
 validLeadCards :: RoundState -> [Card] -> [Card]
@@ -159,15 +167,15 @@ validLeadCards rs cs
   | heartsBroken rs = cs
   | otherwise = filter ((/= Hearts) . suit) cs
 
-playCard :: RoundState -> (RoundState -> [Card] -> [Card]) -> IO RoundState
-playCard rs valid = do
+playCard :: GameIO -> RoundState -> (RoundState -> [Card] -> [Card]) -> IO RoundState
+playCard gio rs valid = do
   let p = toPlay rs
   let h = hands rs M.! p
-  card <- selectPlay p h
+  card <- selectPlay gio p h
   let vs = valid rs h
   if card `elem` vs
     then return $ unsafePlayCard rs p card
-    else playCard rs valid
+    else playCard gio rs valid
 
 unsafePlayCard :: RoundState -> Player -> Card -> RoundState
 unsafePlayCard rs p c = rs {
