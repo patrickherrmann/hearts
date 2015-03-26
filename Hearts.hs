@@ -154,7 +154,9 @@ validFirstTrickPlays rs cs
         valid = validPlays rs cs
 
 selectPlay :: GameIO -> Player -> [Card] -> IO Card
-selectPlay gio p hand = return $ head hand
+selectPlay gio p hand = do
+  let pio = (playerIO gio) M.! p
+  (getSelectedCard pio) hand
 
 playTrick :: GameIO -> RoundState -> IO RoundState
 playTrick gio rs = do
