@@ -11,12 +11,12 @@ showPMap pmap toS = mapM_ (putStrLn . showP) $ M.assocs pmap
 
 printPreRound :: GameState -> IO ()
 printPreRound gs = do
-    putStrLn "Scores:"
+    putStrLn "\n---------- Scores:"
     showPMap (scores gs) show
 
 printRoundState :: RoundState -> IO ()
 printRoundState rs = do
-    putStrLn "Pot:"
+    putStrLn "\nPot:"
     showPMap (pot rs) shorthand
 
 printPostGame :: [Player] -> IO ()

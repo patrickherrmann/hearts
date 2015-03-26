@@ -63,7 +63,9 @@ playGame gio = do
 
 playRounds :: GameIO -> GameState -> IO [Player]
 playRounds gio gs
-  | gameOver (scores gs) = return . winners $ scores gs
+  | gameOver (scores gs) = do
+    (showPreRound gio) gs
+    return . winners $ scores gs
   | otherwise = do
     (showPreRound gio) gs
     playRound gio gs >>= playRounds gio
@@ -241,9 +243,9 @@ scoreRound :: PMap [Card] -> PMap Int
 scoreRound = adjustIfMoonShot . M.map (sum . map points)
 
 adjustIfMoonShot :: PMap Int -> PMap Int
-adjustIfMoonShot scores
-    |  M.null $ M.map (==26) scores = scores
-    | otherwise = M.map newScore scores
+adjustIfMoonShot ss
+    | F.any (==26) ss = M.map newScore ss
+    | otherwise = ss
   where newScore 26 = 0
         newScore _  = 26
 
