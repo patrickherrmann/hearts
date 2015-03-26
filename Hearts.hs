@@ -18,13 +18,12 @@ type PMap a = M.Map Player a
 data GameIO = GameIO
   { showPreRound      :: GameState -> IO ()
   , showRoundState    :: RoundState -> IO ()
-  , showPostRound     :: RoundState -> IO ()
   , showPostGame      :: [Player] -> IO ()
   , playerIO          :: PMap PlayerIO
   }
 
 data PlayerIO = PlayerIO
-  { getPassSelections :: [Card] -> IO ([Card], [Card])
+  { getPassSelections :: [Card] -> IO (Card, Card, Card)
   , getSelectedCard   :: [Card] -> IO Card
   }
 
@@ -83,7 +82,6 @@ playRound gio gs = do
   let rs = initialRoundState hs'
   rs' <- playFirstTrick gio rs
   rs'' <- playTricks gio rs'
-  (showPostRound gio) rs''
   return GameState {
     passingPhase = nextPassingPhase $ passingPhase gs,
     scores = M.unionWith (+) (scores gs) (scoreRound $ piles rs'')
@@ -111,7 +109,11 @@ performPassing gio phase hands = do
 selectPasses :: GameIO -> Player -> [Card] -> IO ([Card], [Card])
 selectPasses gio p cs = do
   let pio = (playerIO gio) M.! p
-  (getPassSelections pio) cs
+  (a, b, c) <- (getPassSelections pio) cs
+  let ps = [a, b, c]
+  if all (`elem` cs) ps
+    then return (ps, cs \\ ps)
+    else selectPasses gio p cs
 
 playTricks :: GameIO -> RoundState -> IO RoundState
 playTricks gio rs
@@ -128,15 +130,14 @@ playFirstTrick gio rs = do
   (showRoundState gio) rs3
   rs4 <- playCard gio rs3 validFirstTrickPlays
   (showRoundState gio) rs4
-  return $ collectTrick rs4
+  return $ collectTrick rs4 (trickWinner rs4)
 
-collectTrick :: RoundState -> RoundState
-collectTrick rs = rs {
+collectTrick :: RoundState -> Player -> RoundState
+collectTrick rs w = rs {
     toPlay = w,
     pot = M.empty,
     piles = M.adjust (++ M.elems (pot rs)) w (piles rs)
   }
-  where w = trickWinner rs
 
 trickWinner :: RoundState -> Player
 trickWinner rs = fst
@@ -166,10 +167,17 @@ selectPlay gio p hand = do
 playTrick :: GameIO -> RoundState -> IO RoundState
 playTrick gio rs = do
   rs1 <- playCard gio rs validLeadCards
-  rs2 <- playCard gio rs1 validPlays
+  let rs1' = rs1 {
+    leadSuit = suit . head . M.elems $ (pot rs1)
+  }
+  (showRoundState gio) rs1'
+  rs2 <- playCard gio rs1' validPlays
+  (showRoundState gio) rs2
   rs3 <- playCard gio rs2 validPlays
+  (showRoundState gio) rs3
   rs4 <- playCard gio rs3 validPlays
-  return $ collectTrick rs4
+  (showRoundState gio) rs4
+  return $ collectTrick rs4 (trickWinner rs4)
 
 validLeadCards :: RoundState -> [Card] -> [Card]
 validLeadCards rs cs
