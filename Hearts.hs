@@ -83,6 +83,7 @@ playRound gio gs = do
   let rs = initialRoundState hs'
   rs' <- playFirstTrick gio rs
   rs'' <- playTricks gio rs'
+  (showPostRound gio) rs''
   return GameState {
     passingPhase = nextPassingPhase $ passingPhase gs,
     scores = M.unionWith (+) (scores gs) (scoreRound $ piles rs'')
@@ -120,9 +121,13 @@ playTricks gio rs
 playFirstTrick :: GameIO -> RoundState -> IO RoundState
 playFirstTrick gio rs = do
   let rs1 = unsafePlayCard rs (toPlay rs) (Card Two Clubs)
+  (showRoundState gio) rs1
   rs2 <- playCard gio rs1 validFirstTrickPlays
+  (showRoundState gio) rs2
   rs3 <- playCard gio rs2 validFirstTrickPlays
+  (showRoundState gio) rs3
   rs4 <- playCard gio rs3 validFirstTrickPlays
+  (showRoundState gio) rs4
   return $ collectTrick rs4
 
 collectTrick :: RoundState -> RoundState
