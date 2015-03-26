@@ -130,14 +130,15 @@ playFirstTrick gio rs = do
   (showRoundState gio) rs3
   rs4 <- playCard gio rs3 validFirstTrickPlays
   (showRoundState gio) rs4
-  return $ collectTrick rs4 (trickWinner rs4)
+  return $ collectTrick rs4
 
-collectTrick :: RoundState -> Player -> RoundState
-collectTrick rs w = rs {
+collectTrick :: RoundState -> RoundState
+collectTrick rs = rs {
     toPlay = w,
     pot = M.empty,
     piles = M.adjust (++ M.elems (pot rs)) w (piles rs)
   }
+  where w = trickWinner rs
 
 trickWinner :: RoundState -> Player
 trickWinner rs = fst
@@ -177,7 +178,7 @@ playTrick gio rs = do
   (showRoundState gio) rs3
   rs4 <- playCard gio rs3 validPlays
   (showRoundState gio) rs4
-  return $ collectTrick rs4 (trickWinner rs4)
+  return $ collectTrick rs4
 
 validLeadCards :: RoundState -> [Card] -> [Card]
 validLeadCards rs cs
