@@ -24,7 +24,7 @@ data GameIO = GameIO
   }
 
 data PlayerIO = PlayerIO
-  { getPassSelections :: [Card] -> IO (Card, Card, Card)
+  { getPassSelections :: [Card] -> IO ([Card], [Card])
   , getSelectedCard   :: [Card] -> IO Card
   }
 
@@ -108,7 +108,9 @@ performPassing gio phase hands = do
   return $ M.unionWith (++) shifted keeps
 
 selectPasses :: GameIO -> Player -> [Card] -> IO ([Card], [Card])
-selectPasses gio p cs = return $ splitAt 3 cs
+selectPasses gio p cs = do
+  let pio = (playerIO gio) M.! p
+  (getPassSelections pio) cs
 
 playTricks :: GameIO -> RoundState -> IO RoundState
 playTricks gio rs
