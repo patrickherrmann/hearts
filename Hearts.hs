@@ -8,8 +8,7 @@ import Data.Function
 import qualified Data.Map as M
 import qualified Data.Traversable as T
 import qualified Data.Foldable as F
-import Control.Monad.Random
-import System.Random.Shuffle
+import Data.Random
 
 type PMap a = M.Map Player a
 
@@ -227,7 +226,7 @@ deal :: [Card] -> PMap [Card]
 deal = M.fromList . zip players . transpose . chunksOf 4
 
 shuffledDeck :: IO [Card]
-shuffledDeck = evalRandIO $ shuffleM fullDeck
+shuffledDeck = sample . shuffle $ fullDeck
 
 points :: Card -> Int
 points (Card Queen Spades) = 13

@@ -3,7 +3,6 @@ import Hearts
 import Text.Printf
 import qualified Data.Map as M
 import Data.Random
-import Data.Random.Extras (choice)
 
 showPMap :: PMap a -> (a -> String) -> IO ()
 showPMap pmap toS = mapM_ (putStrLn . showP) $ M.assocs pmap
@@ -11,7 +10,7 @@ showPMap pmap toS = mapM_ (putStrLn . showP) $ M.assocs pmap
 
 printPreRound :: GameState -> IO ()
 printPreRound gs = do
-    putStrLn "\n---------- Scores:"
+    putStrLn "\nScores: -------------"
     showPMap (scores gs) show
 
 printRoundState :: RoundState -> IO ()
@@ -32,7 +31,7 @@ firstThreeCards :: [Card] -> IO (Card, Card, Card)
 firstThreeCards (a:b:c:_) = return (a, b, c)
 
 randomCardSelection :: [Card] -> IO Card
-randomCardSelection = sample . choice
+randomCardSelection = sample . randomElement
 
 main :: IO ()
 main = do
