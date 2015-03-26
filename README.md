@@ -1,1 +1,1 @@
-# Haskell Hearts
+The card game hearts, playable from a command line interface. Work in progress.
