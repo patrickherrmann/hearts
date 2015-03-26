@@ -4,250 +4,252 @@ Sample round of random play:
 
 ```
 ...
+
 Scores: -------------
-N: 70
-E: 74
-S: 98
-W: 96
+N: 61
+E: 61
+S: 99
+W: 65
 
-Pot:
+Trick:
 E: 2C
 
-Pot:
+Trick:
 E: 2C
-S: QC
+S: JC
 
-Pot:
+Trick:
 E: 2C
-S: QC
-W: 3C
+S: JC
+W: AC
 
-Pot:
+Trick:
 N: 4C
 E: 2C
-S: QC
-W: 3C
+S: JC
+W: AC
 
-Pot:
-S: 4S
+Trick:
+W: KC
 
-Pot:
-S: 4S
-W: KS
+Trick:
+N: 5C
+W: KC
 
-Pot:
-N: 6S
-S: 4S
-W: KS
+Trick:
+N: 5C
+E: 3C
+W: KC
 
-Pot:
-N: 6S
-E: 5S
-S: 4S
-W: KS
+Trick:
+N: 5C
+E: 3C
+S: 7C
+W: KC
 
-Pot:
-W: 9D
+Trick:
+W: 9S
 
-Pot:
-N: 7S
-W: 9D
+Trick:
+N: QS
+W: 9S
 
-Pot:
-N: 7S
-E: 8D
-W: 9D
+Trick:
+N: QS
+E: AS
+W: 9S
 
-Pot:
-N: 7S
-E: 8D
-S: 5D
-W: 9D
+Trick:
+N: QS
+E: AS
+S: KS
+W: 9S
 
-Pot:
-W: 4D
+Trick:
+E: 2D
 
-Pot:
-N: 3S
-W: 4D
+Trick:
+E: 2D
+S: 3D
 
-Pot:
-N: 3S
-E: JD
-W: 4D
+Trick:
+E: 2D
+S: 3D
+W: KD
 
-Pot:
-N: 3S
-E: JD
-S: KD
-W: 4D
+Trick:
+N: AD
+E: 2D
+S: 3D
+W: KD
 
-Pot:
-S: 8S
+Trick:
+N: 2S
 
-Pot:
-S: 8S
-W: AS
+Trick:
+N: 2S
+E: 7D
 
-Pot:
-N: JS
-S: 8S
-W: AS
+Trick:
+N: 2S
+E: 7D
+S: 5S
 
-Pot:
-N: JS
-E: 9C
-S: 8S
-W: AS
+Trick:
+N: 2S
+E: 7D
+S: 5S
+W: 4S
 
-Pot:
-W: AD
+Trick:
+S: 3S
 
-Pot:
-N: 3H
-W: AD
+Trick:
+S: 3S
+W: TS
 
-Pot:
-N: 3H
-E: JH
-W: AD
+Trick:
+N: 8S
+S: 3S
+W: TS
 
-Pot:
-N: 3H
-E: JH
-S: 7D
-W: AD
+Trick:
+N: 8S
+E: 4H
+S: 3S
+W: TS
 
-Pot:
-W: 3D
+Trick:
+W: 7H
 
-Pot:
-N: AC
-W: 3D
+Trick:
+N: 9H
+W: 7H
 
-Pot:
-N: AC
-E: 5C
-W: 3D
-
-Pot:
-N: AC
-E: 5C
-S: TD
-W: 3D
-
-Pot:
-S: KH
-
-Pot:
-S: KH
-W: 9H
-
-Pot:
-N: QH
-S: KH
-W: 9H
-
-Pot:
-N: QH
+Trick:
+N: 9H
 E: 2H
+W: 7H
+
+Trick:
+N: 9H
+E: 2H
+S: JH
+W: 7H
+
+Trick:
 S: KH
-W: 9H
 
-Pot:
-S: 9S
+Trick:
+S: KH
+W: 8H
 
-Pot:
-S: 9S
-W: QD
+Trick:
+N: JS
+S: KH
+W: 8H
 
-Pot:
-N: TS
-S: 9S
-W: QD
+Trick:
+N: JS
+E: QH
+S: KH
+W: 8H
 
-Pot:
-N: TS
-E: 7H
-S: 9S
-W: QD
-
-Pot:
-N: QS
-
-Pot:
-N: QS
-E: KC
-
-Pot:
-N: QS
-E: KC
-S: 2S
-
-Pot:
-N: QS
-E: KC
-S: 2S
-W: TH
-
-Pot:
-N: AH
-
-Pot:
-N: AH
-E: 5H
-
-Pot:
-N: AH
-E: 5H
+Trick:
 S: 6H
 
-Pot:
-N: AH
-E: 5H
+Trick:
 S: 6H
+W: 5H
+
+Trick:
+N: JD
+S: 6H
+W: 5H
+
+Trick:
+N: JD
+E: TC
+S: 6H
+W: 5H
+
+Trick:
+S: 4D
+
+Trick:
+S: 4D
 W: 6D
 
-Pot:
-N: 4H
+Trick:
+N: 5D
+S: 4D
+W: 6D
 
-Pot:
-N: 4H
-E: 7C
+Trick:
+N: 5D
+E: 8D
+S: 4D
+W: 6D
 
-Pot:
-N: 4H
-E: 7C
-S: 8H
+Trick:
+E: 9D
 
-Pot:
-N: 4H
-E: 7C
-S: 8H
-W: 2D
+Trick:
+E: 9D
+S: 3H
 
-Pot:
-S: TC
+Trick:
+E: 9D
+S: 3H
+W: QD
 
-Pot:
-S: TC
-W: 6C
+Trick:
+N: QC
+E: 9D
+S: 3H
+W: QD
 
-Pot:
-N: JC
-S: TC
-W: 6C
+Trick:
+W: 6S
 
-Pot:
-N: JC
-E: 8C
-S: TC
-W: 6C
+Trick:
+N: 9C
+W: 6S
+
+Trick:
+N: 9C
+E: 6C
+W: 6S
+
+Trick:
+N: 9C
+E: 6C
+S: AH
+W: 6S
+
+Trick:
+W: 7S
+
+Trick:
+N: 8C
+W: 7S
+
+Trick:
+N: 8C
+E: TD
+W: 7S
+
+Trick:
+N: 8C
+E: TD
+S: TH
+W: 7S
 
 Scores: -------------
-N: 88
+N: 61
 E: 74
-S: 104
-W: 98
-E wins!
+S: 108
+W: 69
+N wins!
+
 ```
