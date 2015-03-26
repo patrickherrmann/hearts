@@ -1,0 +1,2808 @@
+
+---------- Scores:
+N: 0
+E: 0
+S: 0
+W: 0
+
+Pot:
+W: 2C
+
+Pot:
+N: 3C
+W: 2C
+
+Pot:
+N: 3C
+E: KC
+W: 2C
+
+Pot:
+N: 3C
+E: KC
+S: AC
+W: 2C
+
+Pot:
+S: 5C
+
+Pot:
+S: 5C
+W: 7C
+
+Pot:
+N: 6S
+S: 5C
+W: 7C
+
+Pot:
+N: 6S
+E: 8D
+S: 5C
+W: 7C
+
+Pot:
+W: 5D
+
+Pot:
+N: TD
+W: 5D
+
+Pot:
+N: TD
+E: JD
+W: 5D
+
+Pot:
+N: TD
+E: JD
+S: AD
+W: 5D
+
+Pot:
+S: TS
+
+Pot:
+S: TS
+W: KS
+
+Pot:
+N: 4S
+S: TS
+W: KS
+
+Pot:
+N: 4S
+E: 3S
+S: TS
+W: KS
+
+Pot:
+W: QC
+
+Pot:
+N: QS
+W: QC
+
+Pot:
+N: QS
+E: 3D
+W: QC
+
+Pot:
+N: QS
+E: 3D
+S: 6C
+W: QC
+
+Pot:
+W: AS
+
+Pot:
+N: 5S
+W: AS
+
+Pot:
+N: 5S
+E: 2S
+W: AS
+
+Pot:
+N: 5S
+E: 2S
+S: 9S
+W: AS
+
+Pot:
+W: 8C
+
+Pot:
+N: QD
+W: 8C
+
+Pot:
+N: QD
+E: 6D
+W: 8C
+
+Pot:
+N: QD
+E: 6D
+S: 4C
+W: 8C
+
+Pot:
+W: 9C
+
+Pot:
+N: TH
+W: 9C
+
+Pot:
+N: TH
+E: 8S
+W: 9C
+
+Pot:
+N: TH
+E: 8S
+S: TC
+W: 9C
+
+Pot:
+S: KH
+
+Pot:
+S: KH
+W: 3H
+
+Pot:
+N: JH
+S: KH
+W: 3H
+
+Pot:
+N: JH
+E: 4H
+S: KH
+W: 3H
+
+Pot:
+S: QH
+
+Pot:
+S: QH
+W: 6H
+
+Pot:
+N: 7H
+S: QH
+W: 6H
+
+Pot:
+N: 7H
+E: AH
+S: QH
+W: 6H
+
+Pot:
+E: 5H
+
+Pot:
+E: 5H
+S: 9D
+
+Pot:
+E: 5H
+S: 9D
+W: 2H
+
+Pot:
+N: 8H
+E: 5H
+S: 9D
+W: 2H
+
+Pot:
+N: KD
+
+Pot:
+N: KD
+E: 9H
+
+Pot:
+N: KD
+E: 9H
+S: 4D
+
+Pot:
+N: KD
+E: 9H
+S: 4D
+W: 7D
+
+Pot:
+N: 7S
+
+Pot:
+N: 7S
+E: JS
+
+Pot:
+N: 7S
+E: JS
+S: 2D
+
+Pot:
+N: 7S
+E: JS
+S: 2D
+W: JC
+
+---------- Scores:
+N: 4
+E: 4
+S: 5
+W: 13
+
+Pot:
+S: 2C
+
+Pot:
+S: 2C
+W: 5C
+
+Pot:
+N: JC
+S: 2C
+W: 5C
+
+Pot:
+N: JC
+E: 9C
+S: 2C
+W: 5C
+
+Pot:
+N: 9D
+
+Pot:
+N: 9D
+E: 2D
+
+Pot:
+N: 9D
+E: 2D
+S: AD
+
+Pot:
+N: 9D
+E: 2D
+S: AD
+W: KS
+
+Pot:
+S: 8C
+
+Pot:
+S: 8C
+W: AC
+
+Pot:
+N: TC
+S: 8C
+W: AC
+
+Pot:
+N: TC
+E: QC
+S: 8C
+W: AC
+
+Pot:
+W: 7C
+
+Pot:
+N: KC
+W: 7C
+
+Pot:
+N: KC
+E: 6C
+W: 7C
+
+Pot:
+N: KC
+E: 6C
+S: 6H
+W: 7C
+
+Pot:
+N: 4D
+
+Pot:
+N: 4D
+E: 7D
+
+Pot:
+N: 4D
+E: 7D
+S: 5D
+
+Pot:
+N: 4D
+E: 7D
+S: 5D
+W: 4H
+
+Pot:
+E: 4S
+
+Pot:
+E: 4S
+S: 3S
+
+Pot:
+E: 4S
+S: 3S
+W: AS
+
+Pot:
+N: TS
+E: 4S
+S: 3S
+W: AS
+
+Pot:
+W: 8S
+
+Pot:
+N: 5S
+W: 8S
+
+Pot:
+N: 5S
+E: JS
+W: 8S
+
+Pot:
+N: 5S
+E: JS
+S: 6S
+W: 8S
+
+Pot:
+E: JH
+
+Pot:
+E: JH
+S: 2H
+
+Pot:
+E: JH
+S: 2H
+W: TH
+
+Pot:
+N: 5H
+E: JH
+S: 2H
+W: TH
+
+Pot:
+E: QD
+
+Pot:
+E: QD
+S: 6D
+
+Pot:
+E: QD
+S: 6D
+W: 4C
+
+Pot:
+N: 8D
+E: QD
+S: 6D
+W: 4C
+
+Pot:
+E: 9H
+
+Pot:
+E: 9H
+S: QH
+
+Pot:
+E: 9H
+S: QH
+W: AH
+
+Pot:
+N: 3H
+E: 9H
+S: QH
+W: AH
+
+Pot:
+W: 3C
+
+Pot:
+N: 3D
+W: 3C
+
+Pot:
+N: 3D
+E: 7S
+W: 3C
+
+Pot:
+N: 3D
+E: 7S
+S: KD
+W: 3C
+
+Pot:
+W: 2S
+
+Pot:
+N: TD
+W: 2S
+
+Pot:
+N: TD
+E: 9S
+W: 2S
+
+Pot:
+N: TD
+E: 9S
+S: QS
+W: 2S
+
+Pot:
+S: JD
+
+Pot:
+S: JD
+W: 7H
+
+Pot:
+N: 8H
+S: JD
+W: 7H
+
+Pot:
+N: 8H
+E: KH
+S: JD
+W: 7H
+
+---------- Scores:
+N: 5
+E: 9
+S: 21
+W: 17
+
+Pot:
+S: 2C
+
+Pot:
+S: 2C
+W: 5C
+
+Pot:
+N: QC
+S: 2C
+W: 5C
+
+Pot:
+N: QC
+E: AC
+S: 2C
+W: 5C
+
+Pot:
+E: 6S
+
+Pot:
+E: 6S
+S: 5S
+
+Pot:
+E: 6S
+S: 5S
+W: 7S
+
+Pot:
+N: 3S
+E: 6S
+S: 5S
+W: 7S
+
+Pot:
+W: 4C
+
+Pot:
+N: 9C
+W: 4C
+
+Pot:
+N: 9C
+E: 8C
+W: 4C
+
+Pot:
+N: 9C
+E: 8C
+S: 6C
+W: 4C
+
+Pot:
+N: 2D
+
+Pot:
+N: 2D
+E: KD
+
+Pot:
+N: 2D
+E: KD
+S: 5D
+
+Pot:
+N: 2D
+E: KD
+S: 5D
+W: AD
+
+Pot:
+W: JC
+
+Pot:
+N: TC
+W: JC
+
+Pot:
+N: TC
+E: 8S
+W: JC
+
+Pot:
+N: TC
+E: 8S
+S: KH
+W: JC
+
+Pot:
+W: 4D
+
+Pot:
+N: 9D
+W: 4D
+
+Pot:
+N: 9D
+E: QD
+W: 4D
+
+Pot:
+N: 9D
+E: QD
+S: 6D
+W: 4D
+
+Pot:
+E: 6H
+
+Pot:
+E: 6H
+S: 9H
+
+Pot:
+E: 6H
+S: 9H
+W: TH
+
+Pot:
+N: 7H
+E: 6H
+S: 9H
+W: TH
+
+Pot:
+W: 7C
+
+Pot:
+N: QS
+W: 7C
+
+Pot:
+N: QS
+E: AH
+W: 7C
+
+Pot:
+N: QS
+E: AH
+S: TS
+W: 7C
+
+Pot:
+W: 2S
+
+Pot:
+N: KS
+W: 2S
+
+Pot:
+N: KS
+E: TD
+W: 2S
+
+Pot:
+N: KS
+E: TD
+S: JS
+W: 2S
+
+Pot:
+N: 7D
+
+Pot:
+N: 7D
+E: 3H
+
+Pot:
+N: 7D
+E: 3H
+S: 4H
+
+Pot:
+N: 7D
+E: 3H
+S: 4H
+W: 4S
+
+Pot:
+N: 8D
+
+Pot:
+N: 8D
+E: QH
+
+Pot:
+N: 8D
+E: QH
+S: 9S
+
+Pot:
+N: 8D
+E: QH
+S: 9S
+W: AS
+
+Pot:
+N: JD
+
+Pot:
+N: JD
+E: 8H
+
+Pot:
+N: JD
+E: 8H
+S: 2H
+
+Pot:
+N: JD
+E: 8H
+S: 2H
+W: 3C
+
+Pot:
+N: 3D
+
+Pot:
+N: 3D
+E: JH
+
+Pot:
+N: 3D
+E: JH
+S: 5H
+
+Pot:
+N: 3D
+E: JH
+S: 5H
+W: KC
+
+---------- Scores:
+N: 12
+E: 9
+S: 21
+W: 36
+
+Pot:
+S: 2C
+
+Pot:
+S: 2C
+W: AC
+
+Pot:
+N: QC
+S: 2C
+W: AC
+
+Pot:
+N: QC
+E: 3C
+S: 2C
+W: AC
+
+Pot:
+W: KC
+
+Pot:
+N: 5C
+W: KC
+
+Pot:
+N: 5C
+E: 6C
+W: KC
+
+Pot:
+N: 5C
+E: 6C
+S: 4C
+W: KC
+
+Pot:
+W: 4S
+
+Pot:
+N: 3S
+W: 4S
+
+Pot:
+N: 3S
+E: 2S
+W: 4S
+
+Pot:
+N: 3S
+E: 2S
+S: JS
+W: 4S
+
+Pot:
+S: 6D
+
+Pot:
+S: 6D
+W: AD
+
+Pot:
+N: JD
+S: 6D
+W: AD
+
+Pot:
+N: JD
+E: 9D
+S: 6D
+W: AD
+
+Pot:
+W: JC
+
+Pot:
+N: TS
+W: JC
+
+Pot:
+N: TS
+E: 7D
+W: JC
+
+Pot:
+N: TS
+E: 7D
+S: 9C
+W: JC
+
+Pot:
+W: QS
+
+Pot:
+N: KS
+W: QS
+
+Pot:
+N: KS
+E: 5S
+W: QS
+
+Pot:
+N: KS
+E: 5S
+S: 7S
+W: QS
+
+Pot:
+N: 8S
+
+Pot:
+N: 8S
+E: 9S
+
+Pot:
+N: 8S
+E: 9S
+S: AH
+
+Pot:
+N: 8S
+E: 9S
+S: AH
+W: 6S
+
+Pot:
+E: 4D
+
+Pot:
+E: 4D
+S: 8D
+
+Pot:
+E: 4D
+S: 8D
+W: 5D
+
+Pot:
+N: QD
+E: 4D
+S: 8D
+W: 5D
+
+Pot:
+N: AS
+
+Pot:
+N: AS
+E: 8H
+
+Pot:
+N: AS
+E: 8H
+S: KH
+
+Pot:
+N: AS
+E: 8H
+S: KH
+W: JH
+
+Pot:
+N: 3H
+
+Pot:
+N: 3H
+E: 4H
+
+Pot:
+N: 3H
+E: 4H
+S: 9H
+
+Pot:
+N: 3H
+E: 4H
+S: 9H
+W: 6H
+
+Pot:
+S: QH
+
+Pot:
+S: QH
+W: 5H
+
+Pot:
+N: 2H
+S: QH
+W: 5H
+
+Pot:
+N: 2H
+E: 3D
+S: QH
+W: 5H
+
+Pot:
+S: 7C
+
+Pot:
+S: 7C
+W: TC
+
+Pot:
+N: 7H
+S: 7C
+W: TC
+
+Pot:
+N: 7H
+E: KD
+S: 7C
+W: TC
+
+Pot:
+W: TH
+
+Pot:
+N: TD
+W: TH
+
+Pot:
+N: TD
+E: 2D
+W: TH
+
+Pot:
+N: TD
+E: 2D
+S: 8C
+W: TH
+
+---------- Scores:
+N: 28
+E: 10
+S: 28
+W: 38
+
+Pot:
+E: 2C
+
+Pot:
+E: 2C
+S: 7C
+
+Pot:
+E: 2C
+S: 7C
+W: QC
+
+Pot:
+N: 8C
+E: 2C
+S: 7C
+W: QC
+
+Pot:
+W: 9C
+
+Pot:
+N: 8H
+W: 9C
+
+Pot:
+N: 8H
+E: JC
+W: 9C
+
+Pot:
+N: 8H
+E: JC
+S: 5C
+W: 9C
+
+Pot:
+E: AD
+
+Pot:
+E: AD
+S: QD
+
+Pot:
+E: AD
+S: QD
+W: 9S
+
+Pot:
+N: KD
+E: AD
+S: QD
+W: 9S
+
+Pot:
+E: TH
+
+Pot:
+E: TH
+S: 2H
+
+Pot:
+E: TH
+S: 2H
+W: KH
+
+Pot:
+N: 9H
+E: TH
+S: 2H
+W: KH
+
+Pot:
+W: AC
+
+Pot:
+N: JS
+W: AC
+
+Pot:
+N: JS
+E: 4C
+W: AC
+
+Pot:
+N: JS
+E: 4C
+S: 3C
+W: AC
+
+Pot:
+W: 7S
+
+Pot:
+N: 4S
+W: 7S
+
+Pot:
+N: 4S
+E: 6S
+W: 7S
+
+Pot:
+N: 4S
+E: 6S
+S: 8S
+W: 7S
+
+Pot:
+S: 4D
+
+Pot:
+S: 4D
+W: KC
+
+Pot:
+N: 7D
+S: 4D
+W: KC
+
+Pot:
+N: 7D
+E: 2D
+S: 4D
+W: KC
+
+Pot:
+N: 5D
+
+Pot:
+N: 5D
+E: JD
+
+Pot:
+N: 5D
+E: JD
+S: 8D
+
+Pot:
+N: 5D
+E: JD
+S: 8D
+W: 3H
+
+Pot:
+E: 5S
+
+Pot:
+E: 5S
+S: QH
+
+Pot:
+E: 5S
+S: QH
+W: AS
+
+Pot:
+N: QS
+E: 5S
+S: QH
+W: AS
+
+Pot:
+W: JH
+
+Pot:
+N: 5H
+W: JH
+
+Pot:
+N: 5H
+E: 6H
+W: JH
+
+Pot:
+N: 5H
+E: 6H
+S: 7H
+W: JH
+
+Pot:
+W: 4H
+
+Pot:
+N: AH
+W: 4H
+
+Pot:
+N: AH
+E: 3S
+W: 4H
+
+Pot:
+N: AH
+E: 3S
+S: 6D
+W: 4H
+
+Pot:
+N: 2S
+
+Pot:
+N: 2S
+E: TS
+
+Pot:
+N: 2S
+E: TS
+S: 9D
+
+Pot:
+N: 2S
+E: TS
+S: 9D
+W: KS
+
+Pot:
+W: TC
+
+Pot:
+N: TD
+W: TC
+
+Pot:
+N: TD
+E: 6C
+W: TC
+
+Pot:
+N: TD
+E: 6C
+S: 3D
+W: TC
+
+---------- Scores:
+N: 30
+E: 12
+S: 28
+W: 60
+
+Pot:
+S: 2C
+
+Pot:
+S: 2C
+W: KC
+
+Pot:
+N: TC
+S: 2C
+W: KC
+
+Pot:
+N: TC
+E: AC
+S: 2C
+W: KC
+
+Pot:
+E: KS
+
+Pot:
+E: KS
+S: 6S
+
+Pot:
+E: KS
+S: 6S
+W: 7S
+
+Pot:
+N: 9S
+E: KS
+S: 6S
+W: 7S
+
+Pot:
+E: 5C
+
+Pot:
+E: 5C
+S: 3C
+
+Pot:
+E: 5C
+S: 3C
+W: 4C
+
+Pot:
+N: 7C
+E: 5C
+S: 3C
+W: 4C
+
+Pot:
+N: 9C
+
+Pot:
+N: 9C
+E: 5S
+
+Pot:
+N: 9C
+E: 5S
+S: JC
+
+Pot:
+N: 9C
+E: 5S
+S: JC
+W: 8C
+
+Pot:
+S: 2D
+
+Pot:
+S: 2D
+W: 4D
+
+Pot:
+N: 5D
+S: 2D
+W: 4D
+
+Pot:
+N: 5D
+E: 7D
+S: 2D
+W: 4D
+
+Pot:
+E: 2S
+
+Pot:
+E: 2S
+S: AS
+
+Pot:
+E: 2S
+S: AS
+W: 8S
+
+Pot:
+N: 3S
+E: 2S
+S: AS
+W: 8S
+
+Pot:
+S: AD
+
+Pot:
+S: AD
+W: 9H
+
+Pot:
+N: 6D
+S: AD
+W: 9H
+
+Pot:
+N: 6D
+E: 3D
+S: AD
+W: 9H
+
+Pot:
+S: 8H
+
+Pot:
+S: 8H
+W: TH
+
+Pot:
+N: AH
+S: 8H
+W: TH
+
+Pot:
+N: AH
+E: KH
+S: 8H
+W: TH
+
+Pot:
+N: 6C
+
+Pot:
+N: 6C
+E: TS
+
+Pot:
+N: 6C
+E: TS
+S: JD
+
+Pot:
+N: 6C
+E: TS
+S: JD
+W: QC
+
+Pot:
+W: QH
+
+Pot:
+N: JH
+W: QH
+
+Pot:
+N: JH
+E: 4H
+W: QH
+
+Pot:
+N: JH
+E: 4H
+S: KD
+W: QH
+
+Pot:
+W: 7H
+
+Pot:
+N: TD
+W: 7H
+
+Pot:
+N: TD
+E: 3H
+W: 7H
+
+Pot:
+N: TD
+E: 3H
+S: 9D
+W: 7H
+
+Pot:
+W: 2H
+
+Pot:
+N: 8D
+W: 2H
+
+Pot:
+N: 8D
+E: 6H
+W: 2H
+
+Pot:
+N: 8D
+E: 6H
+S: QS
+W: 2H
+
+Pot:
+E: 4S
+
+Pot:
+E: 4S
+S: JS
+
+Pot:
+E: 4S
+S: JS
+W: 5H
+
+Pot:
+N: QD
+E: 4S
+S: JS
+W: 5H
+
+---------- Scores:
+N: 34
+E: 27
+S: 30
+W: 65
+
+Pot:
+S: 2C
+
+Pot:
+S: 2C
+W: 3C
+
+Pot:
+N: QC
+S: 2C
+W: 3C
+
+Pot:
+N: QC
+E: JC
+S: 2C
+W: 3C
+
+Pot:
+N: 5S
+
+Pot:
+N: 5S
+E: 9S
+
+Pot:
+N: 5S
+E: 9S
+S: AS
+
+Pot:
+N: 5S
+E: 9S
+S: AS
+W: 4S
+
+Pot:
+S: 7S
+
+Pot:
+S: 7S
+W: 4C
+
+Pot:
+N: TS
+S: 7S
+W: 4C
+
+Pot:
+N: TS
+E: JS
+S: 7S
+W: 4C
+
+Pot:
+E: 5D
+
+Pot:
+E: 5D
+S: 9D
+
+Pot:
+E: 5D
+S: 9D
+W: TD
+
+Pot:
+N: 8D
+E: 5D
+S: 9D
+W: TD
+
+Pot:
+W: 3D
+
+Pot:
+N: 6H
+W: 3D
+
+Pot:
+N: 6H
+E: 4D
+W: 3D
+
+Pot:
+N: 6H
+E: 4D
+S: JD
+W: 3D
+
+Pot:
+S: 2D
+
+Pot:
+S: 2D
+W: 7D
+
+Pot:
+N: 7H
+S: 2D
+W: 7D
+
+Pot:
+N: 7H
+E: QD
+S: 2D
+W: 7D
+
+Pot:
+E: TC
+
+Pot:
+E: TC
+S: 5C
+
+Pot:
+E: TC
+S: 5C
+W: 7C
+
+Pot:
+N: QH
+E: TC
+S: 5C
+W: 7C
+
+Pot:
+E: 4H
+
+Pot:
+E: 4H
+S: 2S
+
+Pot:
+E: 4H
+S: 2S
+W: 5H
+
+Pot:
+N: AH
+E: 4H
+S: 2S
+W: 5H
+
+Pot:
+N: 3S
+
+Pot:
+N: 3S
+E: 6S
+
+Pot:
+N: 3S
+E: 6S
+S: QS
+
+Pot:
+N: 3S
+E: 6S
+S: QS
+W: 9H
+
+Pot:
+S: AD
+
+Pot:
+S: AD
+W: 6D
+
+Pot:
+N: 8S
+S: AD
+W: 6D
+
+Pot:
+N: 8S
+E: TH
+S: AD
+W: 6D
+
+Pot:
+S: 6C
+
+Pot:
+S: 6C
+W: 8C
+
+Pot:
+N: KS
+S: 6C
+W: 8C
+
+Pot:
+N: KS
+E: KC
+S: 6C
+W: 8C
+
+Pot:
+E: AC
+
+Pot:
+E: AC
+S: 9C
+
+Pot:
+E: AC
+S: 9C
+W: JH
+
+Pot:
+N: KH
+E: AC
+S: 9C
+W: JH
+
+Pot:
+E: 3H
+
+Pot:
+E: 3H
+S: KD
+
+Pot:
+E: 3H
+S: KD
+W: 2H
+
+Pot:
+N: 8H
+E: 3H
+S: KD
+W: 2H
+
+---------- Scores:
+N: 40
+E: 31
+S: 46
+W: 65
+
+Pot:
+S: 2C
+
+Pot:
+S: 2C
+W: 7C
+
+Pot:
+N: 8C
+S: 2C
+W: 7C
+
+Pot:
+N: 8C
+E: AC
+S: 2C
+W: 7C
+
+Pot:
+E: 8S
+
+Pot:
+E: 8S
+S: QS
+
+Pot:
+E: 8S
+S: QS
+W: 4S
+
+Pot:
+N: 9S
+E: 8S
+S: QS
+W: 4S
+
+Pot:
+S: AS
+
+Pot:
+S: AS
+W: KS
+
+Pot:
+N: 6S
+S: AS
+W: KS
+
+Pot:
+N: 6S
+E: TS
+S: AS
+W: KS
+
+Pot:
+S: 4C
+
+Pot:
+S: 4C
+W: TC
+
+Pot:
+N: JC
+S: 4C
+W: TC
+
+Pot:
+N: JC
+E: 5C
+S: 4C
+W: TC
+
+Pot:
+N: 9C
+
+Pot:
+N: 9C
+E: KC
+
+Pot:
+N: 9C
+E: KC
+S: 3C
+
+Pot:
+N: 9C
+E: KC
+S: 3C
+W: TH
+
+Pot:
+E: KD
+
+Pot:
+E: KD
+S: 9D
+
+Pot:
+E: KD
+S: 9D
+W: 6D
+
+Pot:
+N: QD
+E: KD
+S: 9D
+W: 6D
+
+Pot:
+E: 7D
+
+Pot:
+E: 7D
+S: AD
+
+Pot:
+E: 7D
+S: AD
+W: 8D
+
+Pot:
+N: JD
+E: 7D
+S: AD
+W: 8D
+
+Pot:
+S: 4H
+
+Pot:
+S: 4H
+W: 2H
+
+Pot:
+N: AH
+S: 4H
+W: 2H
+
+Pot:
+N: AH
+E: 5H
+S: 4H
+W: 2H
+
+Pot:
+N: KH
+
+Pot:
+N: KH
+E: 6C
+
+Pot:
+N: KH
+E: 6C
+S: QH
+
+Pot:
+N: KH
+E: 6C
+S: QH
+W: 7H
+
+Pot:
+N: 7S
+
+Pot:
+N: 7S
+E: 5S
+
+Pot:
+N: 7S
+E: 5S
+S: JS
+
+Pot:
+N: 7S
+E: 5S
+S: JS
+W: 3S
+
+Pot:
+S: 3H
+
+Pot:
+S: 3H
+W: 6H
+
+Pot:
+N: 9H
+S: 3H
+W: 6H
+
+Pot:
+N: 9H
+E: 5D
+S: 3H
+W: 6H
+
+Pot:
+N: QC
+
+Pot:
+N: QC
+E: 4D
+
+Pot:
+N: QC
+E: 4D
+S: 8H
+
+Pot:
+N: QC
+E: 4D
+S: 8H
+W: 3D
+
+Pot:
+N: JH
+
+Pot:
+N: JH
+E: TD
+
+Pot:
+N: JH
+E: TD
+S: 2D
+
+Pot:
+N: JH
+E: TD
+S: 2D
+W: 2S
+
+---------- Scores:
+N: 52
+E: 32
+S: 59
+W: 65
+
+Pot:
+E: 2C
+
+Pot:
+E: 2C
+S: TC
+
+Pot:
+E: 2C
+S: TC
+W: KC
+
+Pot:
+N: 8C
+E: 2C
+S: TC
+W: KC
+
+Pot:
+W: 4S
+
+Pot:
+N: TS
+W: 4S
+
+Pot:
+N: TS
+E: QS
+W: 4S
+
+Pot:
+N: TS
+E: QS
+S: 8S
+W: 4S
+
+Pot:
+E: 5S
+
+Pot:
+E: 5S
+S: 9S
+
+Pot:
+E: 5S
+S: 9S
+W: 7S
+
+Pot:
+N: 4H
+E: 5S
+S: 9S
+W: 7S
+
+Pot:
+S: JH
+
+Pot:
+S: JH
+W: 9H
+
+Pot:
+N: 3H
+S: JH
+W: 9H
+
+Pot:
+N: 3H
+E: 8H
+S: JH
+W: 9H
+
+Pot:
+S: 6S
+
+Pot:
+S: 6S
+W: 2S
+
+Pot:
+N: 8D
+S: 6S
+W: 2S
+
+Pot:
+N: 8D
+E: 3S
+S: 6S
+W: 2S
+
+Pot:
+S: AS
+
+Pot:
+S: AS
+W: KS
+
+Pot:
+N: 4C
+S: AS
+W: KS
+
+Pot:
+N: 4C
+E: 9D
+S: AS
+W: KS
+
+Pot:
+S: 2D
+
+Pot:
+S: 2D
+W: 4D
+
+Pot:
+N: 7D
+S: 2D
+W: 4D
+
+Pot:
+N: 7D
+E: 6D
+S: 2D
+W: 4D
+
+Pot:
+N: QH
+
+Pot:
+N: QH
+E: 6H
+
+Pot:
+N: QH
+E: 6H
+S: AH
+
+Pot:
+N: QH
+E: 6H
+S: AH
+W: 3D
+
+Pot:
+S: JD
+
+Pot:
+S: JD
+W: TD
+
+Pot:
+N: KD
+S: JD
+W: TD
+
+Pot:
+N: KD
+E: 5H
+S: JD
+W: TD
+
+Pot:
+N: KH
+
+Pot:
+N: KH
+E: 7H
+
+Pot:
+N: KH
+E: 7H
+S: AC
+
+Pot:
+N: KH
+E: 7H
+S: AC
+W: 6C
+
+Pot:
+N: 2H
+
+Pot:
+N: 2H
+E: 3C
+
+Pot:
+N: 2H
+E: 3C
+S: 9C
+
+Pot:
+N: 2H
+E: 3C
+S: 9C
+W: JC
+
+Pot:
+N: QC
+
+Pot:
+N: QC
+E: 5C
+
+Pot:
+N: QC
+E: 5C
+S: JS
+
+Pot:
+N: QC
+E: 5C
+S: JS
+W: QD
+
+Pot:
+N: TH
+
+Pot:
+N: TH
+E: 7C
+
+Pot:
+N: TH
+E: 7C
+S: 5D
+
+Pot:
+N: TH
+E: 7C
+S: 5D
+W: AD
+
+---------- Scores:
+N: 57
+E: 45
+S: 67
+W: 65
+
+Pot:
+S: 2C
+
+Pot:
+S: 2C
+W: KC
+
+Pot:
+N: JC
+S: 2C
+W: KC
+
+Pot:
+N: JC
+E: 9C
+S: 2C
+W: KC
+
+Pot:
+W: TC
+
+Pot:
+N: AC
+W: TC
+
+Pot:
+N: AC
+E: 3C
+W: TC
+
+Pot:
+N: AC
+E: 3C
+S: 5C
+W: TC
+
+Pot:
+N: 9S
+
+Pot:
+N: 9S
+E: 5S
+
+Pot:
+N: 9S
+E: 5S
+S: 6S
+
+Pot:
+N: 9S
+E: 5S
+S: 6S
+W: 2S
+
+Pot:
+N: 7D
+
+Pot:
+N: 7D
+E: 9D
+
+Pot:
+N: 7D
+E: 9D
+S: 3D
+
+Pot:
+N: 7D
+E: 9D
+S: 3D
+W: 6D
+
+Pot:
+E: JD
+
+Pot:
+E: JD
+S: QD
+
+Pot:
+E: JD
+S: QD
+W: 8D
+
+Pot:
+N: 2D
+E: JD
+S: QD
+W: 8D
+
+Pot:
+S: 7C
+
+Pot:
+S: 7C
+W: QC
+
+Pot:
+N: 9H
+S: 7C
+W: QC
+
+Pot:
+N: 9H
+E: 4S
+S: 7C
+W: QC
+
+Pot:
+W: AS
+
+Pot:
+N: TS
+W: AS
+
+Pot:
+N: TS
+E: KS
+W: AS
+
+Pot:
+N: TS
+E: KS
+S: TH
+W: AS
+
+Pot:
+W: JS
+
+Pot:
+N: QS
+W: JS
+
+Pot:
+N: QS
+E: 8S
+W: JS
+
+Pot:
+N: QS
+E: 8S
+S: 5H
+W: JS
+
+Pot:
+N: KD
+
+Pot:
+N: KD
+E: 5D
+
+Pot:
+N: KD
+E: 5D
+S: 4C
+
+Pot:
+N: KD
+E: 5D
+S: 4C
+W: 6C
+
+Pot:
+N: TD
+
+Pot:
+N: TD
+E: 4D
+
+Pot:
+N: TD
+E: 4D
+S: KH
+
+Pot:
+N: TD
+E: 4D
+S: KH
+W: 7S
+
+Pot:
+N: QH
+
+Pot:
+N: QH
+E: JH
+
+Pot:
+N: QH
+E: JH
+S: 2H
+
+Pot:
+N: QH
+E: JH
+S: 2H
+W: 4H
+
+Pot:
+N: 8H
+
+Pot:
+N: 8H
+E: 6H
+
+Pot:
+N: 8H
+E: 6H
+S: 7H
+
+Pot:
+N: 8H
+E: 6H
+S: 7H
+W: 3H
+
+Pot:
+N: AH
+
+Pot:
+N: AH
+E: AD
+
+Pot:
+N: AH
+E: AD
+S: 8C
+
+Pot:
+N: AH
+E: AD
+S: 8C
+W: 3S
+
+---------- Scores:
+N: 81
+E: 45
+S: 67
+W: 67
+
+Pot:
+W: 2C
+
+Pot:
+N: 7C
+W: 2C
+
+Pot:
+N: 7C
+E: 8C
+W: 2C
+
+Pot:
+N: 7C
+E: 8C
+S: 6C
+W: 2C
+
+Pot:
+E: AS
+
+Pot:
+E: AS
+S: 7S
+
+Pot:
+E: AS
+S: 7S
+W: 6S
+
+Pot:
+N: 4S
+E: AS
+S: 7S
+W: 6S
+
+Pot:
+E: AC
+
+Pot:
+E: AC
+S: JC
+
+Pot:
+E: AC
+S: JC
+W: QC
+
+Pot:
+N: KC
+E: AC
+S: JC
+W: QC
+
+Pot:
+E: KD
+
+Pot:
+E: KD
+S: 3D
+
+Pot:
+E: KD
+S: 3D
+W: TD
+
+Pot:
+N: 4D
+E: KD
+S: 3D
+W: TD
+
+Pot:
+E: 5C
+
+Pot:
+E: 5C
+S: AD
+
+Pot:
+E: 5C
+S: AD
+W: TC
+
+Pot:
+N: QS
+E: 5C
+S: AD
+W: TC
+
+Pot:
+W: 3C
+
+Pot:
+N: 2H
+W: 3C
+
+Pot:
+N: 2H
+E: JS
+W: 3C
+
+Pot:
+N: 2H
+E: JS
+S: 6D
+W: 3C
+
+Pot:
+W: 9C
+
+Pot:
+N: 3S
+W: 9C
+
+Pot:
+N: 3S
+E: KS
+W: 9C
+
+Pot:
+N: 3S
+E: KS
+S: KH
+W: 9C
+
+Pot:
+W: TS
+
+Pot:
+N: 9S
+W: TS
+
+Pot:
+N: 9S
+E: 8H
+W: TS
+
+Pot:
+N: 9S
+E: 8H
+S: 2S
+W: TS
+
+Pot:
+W: QD
+
+Pot:
+N: JD
+W: QD
+
+Pot:
+N: JD
+E: 9D
+W: QD
+
+Pot:
+N: JD
+E: 9D
+S: 5D
+W: QD
+
+Pot:
+W: 4C
+
+Pot:
+N: 8D
+W: 4C
+
+Pot:
+N: 8D
+E: 4H
+W: 4C
+
+Pot:
+N: 8D
+E: 4H
+S: 8S
+W: 4C
+
+Pot:
+W: 6H
+
+Pot:
+N: 9H
+W: 6H
+
+Pot:
+N: 9H
+E: 3H
+W: 6H
+
+Pot:
+N: 9H
+E: 3H
+S: AH
+W: 6H
+
+Pot:
+S: 7D
+
+Pot:
+S: 7D
+W: JH
+
+Pot:
+N: 2D
+S: 7D
+W: JH
+
+Pot:
+N: 2D
+E: QH
+S: 7D
+W: JH
+
+Pot:
+S: 5S
+
+Pot:
+S: 5S
+W: 7H
+
+Pot:
+N: 5H
+S: 5S
+W: 7H
+
+Pot:
+N: 5H
+E: TH
+S: 5S
+W: 7H
+
+---------- Scores:
+N: 81
+E: 45
+S: 76
+W: 84
+
+Pot:
+E: 2C
+
+Pot:
+E: 2C
+S: 5C
+
+Pot:
+E: 2C
+S: 5C
+W: 3C
+
+Pot:
+N: 9C
+E: 2C
+S: 5C
+W: 3C
+
+Pot:
+N: 4C
+
+Pot:
+N: 4C
+E: 8C
+
+Pot:
+N: 4C
+E: 8C
+S: KC
+
+Pot:
+N: 4C
+E: 8C
+S: KC
+W: QC
+
+Pot:
+S: 8S
+
+Pot:
+S: 8S
+W: 5S
+
+Pot:
+N: TS
+S: 8S
+W: 5S
+
+Pot:
+N: TS
+E: 3S
+S: 8S
+W: 5S
+
+Pot:
+N: 4S
+
+Pot:
+N: 4S
+E: 7S
+
+Pot:
+N: 4S
+E: 7S
+S: 2S
+
+Pot:
+N: 4S
+E: 7S
+S: 2S
+W: JS
+
+Pot:
+W: AD
+
+Pot:
+N: 4D
+W: AD
+
+Pot:
+N: 4D
+E: 7D
+W: AD
+
+Pot:
+N: 4D
+E: 7D
+S: 8D
+W: AD
+
+Pot:
+W: JC
+
+Pot:
+N: TC
+W: JC
+
+Pot:
+N: TC
+E: 6C
+W: JC
+
+Pot:
+N: TC
+E: 6C
+S: 7C
+W: JC
+
+Pot:
+W: QD
+
+Pot:
+N: 2D
+W: QD
+
+Pot:
+N: 2D
+E: 6D
+W: QD
+
+Pot:
+N: 2D
+E: 6D
+S: 3D
+W: QD
+
+Pot:
+W: QS
+
+Pot:
+N: 9S
+W: QS
+
+Pot:
+N: 9S
+E: 9D
+W: QS
+
+Pot:
+N: 9S
+E: 9D
+S: AS
+W: QS
+
+Pot:
+S: 5D
+
+Pot:
+S: 5D
+W: KD
+
+Pot:
+N: TD
+S: 5D
+W: KD
+
+Pot:
+N: TD
+E: JD
+S: 5D
+W: KD

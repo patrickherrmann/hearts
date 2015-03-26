@@ -59,15 +59,15 @@ playGame :: GameIO -> IO ()
 playGame gio = do
   let gs = initialGameState
   ws <- playRounds gio gs
-  (showPostGame gio) ws
+  showPostGame gio ws
 
 playRounds :: GameIO -> GameState -> IO [Player]
 playRounds gio gs
   | gameOver (scores gs) = do
-    (showPreRound gio) gs
+    showPreRound gio gs
     return . winners $ scores gs
   | otherwise = do
-    (showPreRound gio) gs
+    showPreRound gio gs
     playRound gio gs >>= playRounds gio
 
 initialGameState :: GameState
@@ -110,8 +110,8 @@ performPassing gio phase hands = do
 
 selectPasses :: GameIO -> Player -> [Card] -> IO ([Card], [Card])
 selectPasses gio p cs = do
-  let pio = (playerIO gio) M.! p
-  (a, b, c) <- (getPassSelections pio) cs
+  let pio = playerIO gio M.! p
+  (a, b, c) <- getPassSelections pio cs
   let ps = [a, b, c]
   if all (`elem` cs) ps
     then return (ps, cs \\ ps)
@@ -125,13 +125,13 @@ playTricks gio rs
 playFirstTrick :: GameIO -> RoundState -> IO RoundState
 playFirstTrick gio rs = do
   let rs1 = unsafePlayCard rs (toPlay rs) (Card Two Clubs)
-  (showRoundState gio) rs1
+  showRoundState gio rs1
   rs2 <- playCard gio rs1 validFirstTrickPlays
-  (showRoundState gio) rs2
+  showRoundState gio rs2
   rs3 <- playCard gio rs2 validFirstTrickPlays
-  (showRoundState gio) rs3
+  showRoundState gio rs3
   rs4 <- playCard gio rs3 validFirstTrickPlays
-  (showRoundState gio) rs4
+  showRoundState gio rs4
   return $ collectTrick rs4
 
 collectTrick :: RoundState -> RoundState
@@ -164,22 +164,22 @@ validFirstTrickPlays rs cs
 
 selectPlay :: GameIO -> Player -> [Card] -> IO Card
 selectPlay gio p hand = do
-  let pio = (playerIO gio) M.! p
-  (getSelectedCard pio) hand
+  let pio = playerIO gio M.! p
+  getSelectedCard pio hand
 
 playTrick :: GameIO -> RoundState -> IO RoundState
 playTrick gio rs = do
   rs1 <- playCard gio rs validLeadCards
   let rs1' = rs1 {
-    leadSuit = suit . head . M.elems $ (pot rs1)
+    leadSuit = suit . head . M.elems $ pot rs1
   }
-  (showRoundState gio) rs1'
+  showRoundState gio rs1'
   rs2 <- playCard gio rs1' validPlays
-  (showRoundState gio) rs2
+  showRoundState gio rs2
   rs3 <- playCard gio rs2 validPlays
-  (showRoundState gio) rs3
+  showRoundState gio rs3
   rs4 <- playCard gio rs3 validPlays
-  (showRoundState gio) rs4
+  showRoundState gio rs4
   return $ collectTrick rs4
 
 validLeadCards :: RoundState -> [Card] -> [Card]
