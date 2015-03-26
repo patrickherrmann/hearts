@@ -1,6 +1,7 @@
 name:                hearts
 version:             0.1.0.0
 synopsis:            Play hearts from a command line interface
+description:		 The card game hearts, playable from a command line interface. Work in progress.
 license:             MIT
 license-file:        LICENSE
 author:              Patrick Herrmann
@@ -10,6 +11,10 @@ category:            Game
 build-type:          Simple
 extra-source-files:  README.md
 cabal-version:       >=1.10
+
+source-repository head
+    type:              git
+    location:          https://github.com/patrickherrmann/hearts.git
 
 executable hearts
   ghc-options:         -Wall
