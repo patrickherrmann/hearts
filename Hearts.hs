@@ -201,8 +201,10 @@ validFirstTrickPlays rs cs
 
 validLeadCards :: Validator
 validLeadCards rs cs
-  | heartsBroken rs = cs
-  | otherwise = filter ((/= Hearts) . suit) cs
+    | heartsBroken rs = cs
+    | null nonHearts = cs
+    | otherwise = nonHearts
+  where nonHearts = filter ((/= Hearts) . suit) cs
 
 passingTarget :: PassingPhase -> Player -> Player
 passingTarget Keep = id
