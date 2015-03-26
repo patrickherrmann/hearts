@@ -151,7 +151,9 @@ playTrick gio rs = do
   showRoundState gio rs4
   return $ collectTrick rs4
 
-playCard :: GameIO -> RoundState -> (RoundState -> [Card] -> [Card]) -> IO RoundState
+type Validator = RoundState -> [Card] -> [Card]
+
+playCard :: GameIO -> RoundState -> Validator -> IO RoundState
 playCard gio rs valid = do
   let p = toPlay rs
   let h = hands rs M.! p
@@ -183,13 +185,13 @@ trickWinner rs = fst
                . filter ((== leadSuit rs) . suit . snd)
                $ M.assocs (pot rs)
 
-validPlays :: RoundState -> [Card] -> [Card]
+validPlays :: Validator
 validPlays rs cs
     | null ofLeadSuit = cs
     | otherwise = ofLeadSuit
   where ofLeadSuit = filter ((== leadSuit rs) . suit) cs
 
-validFirstTrickPlays :: RoundState -> [Card] -> [Card]
+validFirstTrickPlays :: Validator
 validFirstTrickPlays rs cs
     | null opts = valid
     | otherwise = opts
@@ -197,7 +199,7 @@ validFirstTrickPlays rs cs
         opts = filter notBloody valid
         valid = validPlays rs cs
 
-validLeadCards :: RoundState -> [Card] -> [Card]
+validLeadCards :: Validator
 validLeadCards rs cs
   | heartsBroken rs = cs
   | otherwise = filter ((/= Hearts) . suit) cs
