@@ -4,6 +4,7 @@ import Data.List
 import Data.List.Split
 import Data.Ord
 import Cards
+import Data.Monoid
 import Data.Function
 import qualified Data.Map as M
 import qualified Data.Traversable as T
@@ -22,6 +23,7 @@ data GameIO = GameIO
 data PlayerIO = PlayerIO
   { getPassSelections :: [Card] -> IO (Card, Card, Card)
   , getSelectedCard   :: [Card] -> IO Card
+  , receiveFeedback   :: String -> IO ()
   }
 
 data Player
@@ -121,15 +123,12 @@ playTricks gio rs
 
 playFirstTrick :: GameIO -> RoundState -> IO RoundState
 playFirstTrick gio rs = do
-  let rs1 = unsafePlayCard rs (toPlay rs) (Card Two Clubs)
-  showRoundState gio rs1
-  rs2 <- playCard gio rs1 validFirstTrickPlays
-  showRoundState gio rs2
-  rs3 <- playCard gio rs2 validFirstTrickPlays
-  showRoundState gio rs3
-  rs4 <- playCard gio rs3 validFirstTrickPlays
-  showRoundState gio rs4
-  return $ collectTrick rs4
+  let rs' = unsafePlayCard rs (toPlay rs) (Card Two Clubs)
+  showRoundState gio rs'
+  rs'' <- progressRound gio continueFirstTrick rs'
+      >>= progressRound gio continueFirstTrick
+      >>= progressRound gio continueFirstTrick
+  return $ collectTrick rs''
 
 selectPlay :: GameIO -> Player -> [Card] -> IO Card
 selectPlay gio p hand = do
@@ -138,30 +137,14 @@ selectPlay gio p hand = do
 
 playTrick :: GameIO -> RoundState -> IO RoundState
 playTrick gio rs = do
-  rs1 <- playCard gio rs validLeadCards
-  let rs1' = rs1 {
-    leadSuit = suit . head . M.elems $ pot rs1
+  newRound <- progressRound gio leadTrick rs
+  let rs' = newRound {
+    leadSuit = suit . head . M.elems $ pot newRound
   }
-  showRoundState gio rs1'
-  rs2 <- playCard gio rs1' validPlays
-  showRoundState gio rs2
-  rs3 <- playCard gio rs2 validPlays
-  showRoundState gio rs3
-  rs4 <- playCard gio rs3 validPlays
-  showRoundState gio rs4
-  return $ collectTrick rs4
-
-type Validator = RoundState -> [Card] -> [Card]
-
-playCard :: GameIO -> RoundState -> Validator -> IO RoundState
-playCard gio rs valid = do
-  let p = toPlay rs
-  let h = hands rs M.! p
-  card <- selectPlay gio p h
-  let vs = valid rs h
-  if card `elem` vs
-    then return $ unsafePlayCard rs p card
-    else playCard gio rs valid
+  rs'' <- progressRound gio continueTrick rs'
+      >>= progressRound gio continueTrick
+      >>= progressRound gio continueTrick
+  return $ collectTrick rs''
 
 unsafePlayCard :: RoundState -> Player -> Card -> RoundState
 unsafePlayCard rs p c = rs {
@@ -185,27 +168,6 @@ trickWinner rs = fst
                . filter ((== leadSuit rs) . suit . snd)
                $ M.assocs (pot rs)
 
-validPlays :: Validator
-validPlays rs cs
-    | null ofLeadSuit = cs
-    | otherwise = ofLeadSuit
-  where ofLeadSuit = filter ((== leadSuit rs) . suit) cs
-
-validFirstTrickPlays :: Validator
-validFirstTrickPlays rs cs
-    | null opts = valid
-    | otherwise = opts
-  where notBloody = (==0) . points
-        opts = filter notBloody valid
-        valid = validPlays rs cs
-
-validLeadCards :: Validator
-validLeadCards rs cs
-    | heartsBroken rs = cs
-    | null nonHearts = cs
-    | otherwise = nonHearts
-  where nonHearts = filter ((/= Hearts) . suit) cs
-
 passingTarget :: PassingPhase -> Player -> Player
 passingTarget Keep = id
 passingTarget PassLeft = nextPlayer
@@ -226,6 +188,9 @@ nextPlayer p = succ p
 firstPlayer :: PMap [Card] -> Player
 firstPlayer = head . M.keys . M.filter (Card Two Clubs `elem`)
 
+handToPlay :: RoundState -> [Card]
+handToPlay rs = hands rs M.! toPlay rs
+
 deal :: [Card] -> PMap [Card]
 deal = M.fromList . zip players . transpose . chunksOf 4
 
@@ -236,6 +201,9 @@ points :: Card -> Int
 points (Card Queen Spades) = 13
 points (Card _ Hearts)     = 1
 points _                   = 0
+
+worthPoints :: Card -> Bool
+worthPoints = (>0) . points
 
 roundOver :: RoundState -> Bool
 roundOver = F.any null . hands
@@ -259,3 +227,44 @@ winners = map fst
 
 gameOver :: PMap Int -> Bool
 gameOver = F.any (>= 100)
+
+type PlayValidation = RoundState -> Card -> Maybe String
+
+progressRound :: GameIO -> [PlayValidation] -> RoundState -> IO RoundState
+progressRound gio vs rs = do
+  let pio = playerIO gio M.! toPlay rs
+  c <- getSelectedCard pio (hands rs M.! toPlay rs)
+  let (First merr) = mconcat $ map (\v -> First $ v rs c) vs
+  let rs' = unsafePlayCard rs (toPlay rs) c
+  case merr of
+    Just err -> receiveFeedback pio err >> progressRound gio vs rs
+    Nothing  -> showRoundState gio rs' >> return rs'
+
+hasCardInHand :: PlayValidation
+hasCardInHand rs c
+  | c `elem` handToPlay rs = Nothing
+  | otherwise = Just "You can't play a card that's not in your hand!"
+
+playingLeadSuit :: PlayValidation
+playingLeadSuit rs c
+  | suit c == leadSuit rs || all ((/= leadSuit rs) . suit) (handToPlay rs) = Nothing
+  | otherwise = Just "You have a card of the lead suit so you must play it!"
+
+notLeadingUnbrokenHearts :: PlayValidation
+notLeadingUnbrokenHearts rs c
+  | suit c /= Hearts || all ((== Hearts) . suit) (handToPlay rs) = Nothing
+  | otherwise = Just "You can't lead hearts until hearts have been broken!"
+
+notPlayingPointCards :: PlayValidation
+notPlayingPointCards rs c
+  | not $ worthPoints c || all worthPoints (handToPlay rs) = Nothing
+  | otherwise = Just "You can't play point cards on the first round!"
+
+leadTrick :: [PlayValidation]
+leadTrick = [hasCardInHand, notLeadingUnbrokenHearts]
+
+continueTrick :: [PlayValidation]
+continueTrick = [hasCardInHand, playingLeadSuit]
+
+continueFirstTrick :: [PlayValidation]
+continueFirstTrick = [hasCardInHand, playingLeadSuit, notPlayingPointCards]

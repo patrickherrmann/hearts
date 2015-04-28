@@ -37,7 +37,8 @@ main :: IO ()
 main = do
   let pio = PlayerIO {
     getPassSelections = firstThreeCards,
-    getSelectedCard = randomCardSelection
+    getSelectedCard = randomCardSelection,
+    receiveFeedback = putStrLn
   }
   let piomap = M.fromList . zip players $ repeat pio
   let gio = GameIO {
