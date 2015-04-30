@@ -3,6 +3,11 @@ import Hearts
 import Text.Printf
 import qualified Data.Map as M
 import Data.Random
+import Data.List
+import Control.Applicative
+import System.IO
+import Data.Ord
+import Data.Monoid
 
 showPMap :: PMap a -> (a -> String) -> IO ()
 showPMap pmap toS = mapM_ (putStrLn . showP) $ M.assocs pmap
@@ -33,6 +38,31 @@ firstThreeCards (a:b:c:_) = return (a, b, c)
 randomCardSelection :: [Card] -> IO Card
 randomCardSelection = sample . randomElement
 
+showHand :: [Card] -> IO ()
+showHand cs = do
+  let sorted = sortBy (comparing suit <> comparing rank) cs
+  putStrLn "Your hand:"
+  putStrLn . intercalate " " $ map show sorted
+
+promptCard :: [Card] -> IO Card
+promptCard cs = do
+  showHand cs
+  putStr "Enter a card to play: " >> hFlush stdout
+  input <- getLine
+  let parseError = putStrLn "Not a card!" >> promptCard cs
+  maybe parseError return (readCard input)
+
+promptThreeCards :: [Card] -> IO (Card, Card, Card)
+promptThreeCards cs = do
+  showHand cs
+  putStr "Enter three cards to pass: " >> hFlush stdout
+  inputs <- words <$> getLine
+  case map readCard inputs of
+    [Just a, Just b, Just c] -> return (a, b, c)
+    _ -> do
+      putStrLn "Invalid input..."
+      promptThreeCards cs
+
 main :: IO ()
 main = do
   let randomPlayer = PlayerIO {
@@ -44,8 +74,8 @@ main = do
     showPostGame = const $ return ()
   }
   let humanPlayer = PlayerIO {
-    getPassSelections = firstThreeCards,
-    getSelectedCard = randomCardSelection,
+    getPassSelections = promptThreeCards,
+    getSelectedCard = promptCard,
     receiveFeedback = putStrLn,
     showPreRound = printPreRound,
     showRoundState = printRoundState,

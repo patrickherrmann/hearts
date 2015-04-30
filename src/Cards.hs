@@ -25,14 +25,14 @@ data Rank
   | Queen
   | King
   | Ace
-  deriving (Eq, Ord, Enum)
+  deriving (Eq, Enum, Ord)
 
 data Suit
   = Clubs
   | Diamonds
   | Hearts
   | Spades
-   deriving (Eq, Enum)
+   deriving (Eq, Enum, Ord)
 
 data Card = Card
   { rank :: Rank
