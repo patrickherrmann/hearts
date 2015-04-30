@@ -1,7 +1,7 @@
 name:                hearts
 version:             0.1.0.0
 synopsis:            Play hearts from a command line interface
-description:		     The card game hearts, playable from a command line interface. Work in progress.
+description:         The card game hearts, playable from a command line interface. Work in progress.
 license:             MIT
 license-file:        LICENSE
 author:              Patrick Herrmann
