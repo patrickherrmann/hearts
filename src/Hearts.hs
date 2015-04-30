@@ -1,3 +1,5 @@
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+
 module Hearts where
 
 import Data.List
@@ -5,11 +7,23 @@ import Data.List.Split
 import Data.Ord
 import Cards
 import Data.Monoid
+import Control.Applicative
 import Data.Function
 import qualified Data.Map as M
 import qualified Data.Traversable as T
 import qualified Data.Foldable as F
 import Data.Random
+import Control.Monad.Reader
+
+newtype HeartsIO a = HeartsIO
+  { runHearts :: ReaderT GameIO IO a
+  } deriving
+  ( Functor
+  , Applicative
+  , Monad
+  , MonadReader GameIO
+  , MonadIO
+  )
 
 type PMap a = M.Map Player a
 
@@ -54,20 +68,26 @@ data RoundState = RoundState
   , heartsBroken :: Bool
   } deriving (Show)
 
-playGame :: GameIO -> IO ()
-playGame gio = do
-  let gs = initialGameState
-  ws <- playRounds gio gs
-  showPostGame gio ws
+runHeartsWith :: GameIO -> HeartsIO a -> IO a
+runHeartsWith gio = flip runReaderT gio . runHearts
 
-playRounds :: GameIO -> GameState -> IO [Player]
-playRounds gio gs
+doGameIO :: (GameIO-> a -> IO b) -> a -> HeartsIO b
+doGameIO f a = do
+  f' <- asks f
+  liftIO $ f' a
+
+playGame :: GameIO -> IO ()
+playGame gio =  runHeartsWith gio $ playRounds initialGameState
+
+playRounds :: GameState -> HeartsIO ()
+playRounds gs
   | gameOver (scores gs) = do
-    showPreRound gio gs
-    return . winners $ scores gs
+    doGameIO showPreRound gs
+    let ws = winners $ scores gs
+    doGameIO showPostGame ws
   | otherwise = do
-    showPreRound gio gs
-    playRound gio gs >>= playRounds gio
+    doGameIO showPreRound gs
+    playRound gs >>= playRounds
 
 initialGameState :: GameState
 initialGameState = GameState {
@@ -75,14 +95,14 @@ initialGameState = GameState {
   scores = M.fromList . zip players $ repeat 0
 }
 
-playRound :: GameIO -> GameState -> IO GameState
-playRound gio gs = do
-  deck <- shuffledDeck
+playRound :: GameState -> HeartsIO GameState
+playRound gs = do
+  deck <- liftIO shuffledDeck
   let hs = deal deck
-  hs' <- performPassing gio (passingPhase gs) hs
+  hs' <- performPassing (passingPhase gs) hs
   let rs = initialRoundState hs'
-  rs' <- playFirstTrick gio rs
-  rs'' <- playTricks gio rs'
+  rs' <- playFirstTrick rs
+  rs'' <- playTricks rs'
   return GameState {
     passingPhase = nextPassingPhase $ passingPhase gs,
     scores = M.unionWith (+) (scores gs) (scoreRound $ piles rs'')
@@ -98,53 +118,70 @@ initialRoundState hs = RoundState {
   heartsBroken = False
 }
 
-performPassing :: GameIO -> PassingPhase -> PMap [Card] -> IO (PMap [Card])
-performPassing _ Keep hs = return hs
-performPassing gio phase hs = do
-  selections <- T.sequence $ M.mapWithKey (selectPasses gio) hs
+performPassing :: PassingPhase -> PMap [Card] -> HeartsIO (PMap [Card])
+performPassing Keep hs = return hs
+performPassing phase hs = do
+  selections <- T.sequence $ M.mapWithKey selectPasses hs
   let passes = M.map fst selections
   let keeps = M.map snd selections
   let shifted = M.mapKeys (passingTarget phase) passes
   return $ M.unionWith (++) shifted keeps
 
-selectPasses :: GameIO -> Player -> [Card] -> IO ([Card], [Card])
-selectPasses gio p cs = do
+selectPasses :: Player -> [Card] -> HeartsIO ([Card], [Card])
+selectPasses p cs = do
+  gio <- ask
   let pio = playerIO gio M.! p
-  (a, b, c) <- getPassSelections pio cs
+  (a, b, c) <- liftIO $ getPassSelections pio cs
   let ps = [a, b, c]
   if all (`elem` cs) ps
     then return (ps, cs \\ ps)
-    else selectPasses gio p cs
+    else selectPasses p cs
 
-playTricks :: GameIO -> RoundState -> IO RoundState
-playTricks gio rs
+playTricks :: RoundState -> HeartsIO RoundState
+playTricks rs
   | roundOver rs = return rs
-  | otherwise = playTrick gio rs >>= playTricks gio
+  | otherwise = playTrick rs >>= playTricks
 
-playFirstTrick :: GameIO -> RoundState -> IO RoundState
-playFirstTrick gio rs = do
+playFirstTrick :: RoundState -> HeartsIO RoundState
+playFirstTrick rs = do
   let rs' = unsafePlayCard rs (toPlay rs) (Card Two Clubs)
-  showRoundState gio rs'
-  rs'' <- progressRound gio continueFirstTrick rs'
-      >>= progressRound gio continueFirstTrick
-      >>= progressRound gio continueFirstTrick
+  doGameIO showRoundState rs'
+  rs'' <- progressRound continueFirstTrick rs'
+      >>= progressRound continueFirstTrick
+      >>= progressRound continueFirstTrick
   return $ collectTrick rs''
 
-selectPlay :: GameIO -> Player -> [Card] -> IO Card
-selectPlay gio p hand = do
+selectPlay :: Player -> [Card] -> HeartsIO Card
+selectPlay p hand = do
+  gio <- ask
   let pio = playerIO gio M.! p
-  getSelectedCard pio hand
+  liftIO $ getSelectedCard pio hand
 
-playTrick :: GameIO -> RoundState -> IO RoundState
-playTrick gio rs = do
-  newRound <- progressRound gio leadTrick rs
+playTrick :: RoundState -> HeartsIO RoundState
+playTrick rs = do
+  newRound <- progressRound leadTrick rs
   let rs' = newRound {
     leadSuit = suit . head . M.elems $ pot newRound
   }
-  rs'' <- progressRound gio continueTrick rs'
-      >>= progressRound gio continueTrick
-      >>= progressRound gio continueTrick
+  rs'' <- progressRound continueTrick rs'
+      >>= progressRound continueTrick
+      >>= progressRound continueTrick
   return $ collectTrick rs''
+
+progressRound :: [PlayValidation] -> RoundState -> HeartsIO RoundState
+progressRound vs rs = do
+  gio <- ask
+  let pio = playerIO gio M.! toPlay rs
+  c <- liftIO $ getSelectedCard pio (hands rs M.! toPlay rs)
+  let (First merr) = mconcat $ map (\v -> First $ v rs c) vs
+  let rs' = unsafePlayCard rs (toPlay rs) c
+  case merr of
+    Just err -> do
+      liftIO $ receiveFeedback pio err
+      progressRound vs rs
+    Nothing  -> do
+      doGameIO showRoundState rs'
+      return rs'
 
 unsafePlayCard :: RoundState -> Player -> Card -> RoundState
 unsafePlayCard rs p c = rs {
@@ -229,16 +266,6 @@ gameOver :: PMap Int -> Bool
 gameOver = F.any (>= 100)
 
 type PlayValidation = RoundState -> Card -> Maybe String
-
-progressRound :: GameIO -> [PlayValidation] -> RoundState -> IO RoundState
-progressRound gio vs rs = do
-  let pio = playerIO gio M.! toPlay rs
-  c <- getSelectedCard pio (hands rs M.! toPlay rs)
-  let (First merr) = mconcat $ map (\v -> First $ v rs c) vs
-  let rs' = unsafePlayCard rs (toPlay rs) c
-  case merr of
-    Just err -> receiveFeedback pio err >> progressRound gio vs rs
-    Nothing  -> showRoundState gio rs' >> return rs'
 
 hasCardInHand :: PlayValidation
 hasCardInHand rs c

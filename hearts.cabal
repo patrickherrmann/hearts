@@ -18,5 +18,6 @@ executable hearts
   build-depends:       base == 4.*,
                        containers,
                        split,
-                       random-fu
+                       random-fu,
+                       mtl
   default-language:    Haskell2010
