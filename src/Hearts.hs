@@ -1,6 +1,15 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 
-module Hearts where
+module Hearts
+  ( GameIO(..)
+  , PlayerIO(..)
+  , Player(..)
+  , PassingPhase(..)
+  , MoveInfraction(..)
+  , GameState(..)
+  , RoundStateView(..)
+  , playGame
+  ) where
 
 import Data.List
 import Data.List.Split
@@ -82,11 +91,6 @@ data RoundStateView = RoundStateView
 
 runHeartsWith :: GameIO -> HeartsIO a -> IO a
 runHeartsWith gio = flip runReaderT gio . runHearts
-
-doGameIO :: (GameIO-> a -> IO b) -> a -> HeartsIO b
-doGameIO f a = do
-  f' <- asks f
-  liftIO $ f' a
 
 doPlayerIO :: Player -> (PlayerIO -> a -> IO b) -> a -> HeartsIO b
 doPlayerIO p f a = do
