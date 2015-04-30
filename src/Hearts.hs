@@ -28,16 +28,16 @@ newtype HeartsIO a = HeartsIO
 type PMap a = M.Map Player a
 
 data GameIO = GameIO
-  { showPreRound      :: GameState -> IO ()
-  , showRoundState    :: RoundState -> IO ()
-  , showPostGame      :: [Player] -> IO ()
-  , playerIO          :: PMap PlayerIO
+  { playerIO          :: PMap PlayerIO
   }
 
 data PlayerIO = PlayerIO
   { getPassSelections :: [Card] -> IO (Card, Card, Card)
   , getSelectedCard   :: [Card] -> IO Card
   , receiveFeedback   :: String -> IO ()
+  , showPreRound      :: GameState -> IO ()
+  , showRoundState    :: RoundState -> IO ()
+  , showPostGame      :: [Player] -> IO ()
   }
 
 data Player
@@ -78,9 +78,13 @@ doGameIO f a = do
 
 doPlayerIO :: Player -> (PlayerIO -> a -> IO b) -> a -> HeartsIO b
 doPlayerIO p f a = do
-  gio <- ask
-  let pio = playerIO gio M.! p
+  pio <- (M.! p) <$> asks playerIO
   liftIO $ f pio a
+
+doEachPlayerIO_ :: (PlayerIO -> a -> IO b) -> a -> HeartsIO ()
+doEachPlayerIO_ f a = do
+  pios <- M.elems <$> asks playerIO
+  liftIO $ mapM_ (flip f a) pios
 
 playGame :: GameIO -> IO ()
 playGame gio =  runHeartsWith gio $ playRounds initialGameState
@@ -88,11 +92,11 @@ playGame gio =  runHeartsWith gio $ playRounds initialGameState
 playRounds :: GameState -> HeartsIO ()
 playRounds gs
   | gameOver (scores gs) = do
-    doGameIO showPreRound gs
+    doEachPlayerIO_ showPreRound gs
     let ws = winners $ scores gs
-    doGameIO showPostGame ws
+    doEachPlayerIO_ showPostGame ws
   | otherwise = do
-    doGameIO showPreRound gs
+    doEachPlayerIO_ showPreRound gs
     playRound gs >>= playRounds
 
 initialGameState :: GameState
@@ -149,7 +153,7 @@ playTricks rs
 playFirstTrick :: RoundState -> HeartsIO RoundState
 playFirstTrick rs = do
   let rs' = unsafePlayCard rs (toPlay rs) (Card Two Clubs)
-  doGameIO showRoundState rs'
+  doEachPlayerIO_ showRoundState rs'
   rs'' <- progressRound continueFirstTrick rs'
       >>= progressRound continueFirstTrick
       >>= progressRound continueFirstTrick
@@ -180,7 +184,7 @@ progressRound vs rs = do
       doPlayerIO p receiveFeedback err
       progressRound vs rs
     Nothing  -> do
-      doGameIO showRoundState rs'
+      doEachPlayerIO_ showRoundState rs'
       return rs'
 
 unsafePlayCard :: RoundState -> Player -> Card -> RoundState

@@ -35,16 +35,29 @@ randomCardSelection = sample . randomElement
 
 main :: IO ()
 main = do
-  let pio = PlayerIO {
+  let randomPlayer = PlayerIO {
     getPassSelections = firstThreeCards,
     getSelectedCard = randomCardSelection,
-    receiveFeedback = putStrLn
+    receiveFeedback = const $ return (),
+    showPreRound = const $ return (),
+    showRoundState = const $ return (),
+    showPostGame = const $ return ()
   }
-  let piomap = M.fromList . zip players $ repeat pio
-  let gio = GameIO {
+  let humanPlayer = PlayerIO {
+    getPassSelections = firstThreeCards,
+    getSelectedCard = randomCardSelection,
+    receiveFeedback = putStrLn,
     showPreRound = printPreRound,
     showRoundState = printRoundState,
-    showPostGame = printPostGame,
+    showPostGame = printPostGame
+  }
+  let piomap = M.fromList
+        [ (N, humanPlayer)
+        , (E, randomPlayer)
+        , (S, randomPlayer)
+        , (W, randomPlayer)
+        ]
+  let gio = GameIO {
     playerIO = piomap
   }
   playGame gio
