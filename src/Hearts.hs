@@ -76,6 +76,12 @@ doGameIO f a = do
   f' <- asks f
   liftIO $ f' a
 
+doPlayerIO :: Player -> (PlayerIO -> a -> IO b) -> a -> HeartsIO b
+doPlayerIO p f a = do
+  gio <- ask
+  let pio = playerIO gio M.! p
+  liftIO $ f pio a
+
 playGame :: GameIO -> IO ()
 playGame gio =  runHeartsWith gio $ playRounds initialGameState
 
@@ -129,9 +135,7 @@ performPassing phase hs = do
 
 selectPasses :: Player -> [Card] -> HeartsIO ([Card], [Card])
 selectPasses p cs = do
-  gio <- ask
-  let pio = playerIO gio M.! p
-  (a, b, c) <- liftIO $ getPassSelections pio cs
+  (a, b, c) <- doPlayerIO p getPassSelections cs
   let ps = [a, b, c]
   if all (`elem` cs) ps
     then return (ps, cs \\ ps)
@@ -152,10 +156,7 @@ playFirstTrick rs = do
   return $ collectTrick rs''
 
 selectPlay :: Player -> [Card] -> HeartsIO Card
-selectPlay p hand = do
-  gio <- ask
-  let pio = playerIO gio M.! p
-  liftIO $ getSelectedCard pio hand
+selectPlay p hand = doPlayerIO p getSelectedCard hand
 
 playTrick :: RoundState -> HeartsIO RoundState
 playTrick rs = do
@@ -170,14 +171,13 @@ playTrick rs = do
 
 progressRound :: [PlayValidation] -> RoundState -> HeartsIO RoundState
 progressRound vs rs = do
-  gio <- ask
-  let pio = playerIO gio M.! toPlay rs
-  c <- liftIO $ getSelectedCard pio (hands rs M.! toPlay rs)
+  let p = toPlay rs
+  c <- doPlayerIO p getSelectedCard (hands rs M.! p)
   let (First merr) = mconcat $ map (\v -> First $ v rs c) vs
   let rs' = unsafePlayCard rs (toPlay rs) c
   case merr of
     Just err -> do
-      liftIO $ receiveFeedback pio err
+      doPlayerIO p receiveFeedback err
       progressRound vs rs
     Nothing  -> do
       doGameIO showRoundState rs'
