@@ -110,12 +110,10 @@ playRound gs = do
   deck <- liftIO shuffledDeck
   let hs = deal deck
   hs' <- performPassing (passingPhase gs) hs
-  let rs = initialRoundState hs'
-  rs' <- playFirstTrick rs
-  rs'' <- playTricks rs'
+  rs <- playFirstTrick (initialRoundState hs') >>= playTricks
   return GameState {
     passingPhase = nextPassingPhase $ passingPhase gs,
-    scores = M.unionWith (+) (scores gs) (scoreRound $ piles rs'')
+    scores = M.unionWith (+) (scores gs) (scoreRound $ piles rs)
   }
 
 initialRoundState :: PMap [Card] -> RoundState
@@ -150,40 +148,53 @@ playTricks rs
   | roundOver rs = return rs
   | otherwise = playTrick rs >>= playTricks
 
-playFirstTrick :: RoundState -> HeartsIO RoundState
-playFirstTrick rs = do
+leadFirstTrick :: RoundState -> HeartsIO RoundState
+leadFirstTrick rs = do
   let rs' = unsafePlayCard rs (toPlay rs) (Card Two Clubs)
   doEachPlayerIO_ showRoundState rs'
-  rs'' <- progressRound continueFirstTrick rs'
-      >>= progressRound continueFirstTrick
-      >>= progressRound continueFirstTrick
-  return $ collectTrick rs''
+  return rs'
+
+continueFirstTrick :: RoundState -> HeartsIO RoundState
+continueFirstTrick = progressRound validContinueFirstTrick
+
+playFirstTrick :: RoundState -> HeartsIO RoundState
+playFirstTrick = leadFirstTrick
+  >=> continueFirstTrick
+  >=> continueFirstTrick
+  >=> continueFirstTrick
+  >=> return . collectTrick
 
 selectPlay :: Player -> [Card] -> HeartsIO Card
 selectPlay p hand = doPlayerIO p getSelectedCard hand
 
-playTrick :: RoundState -> HeartsIO RoundState
-playTrick rs = do
-  newRound <- progressRound leadTrick rs
-  let rs' = newRound {
-    leadSuit = suit . head . M.elems $ pot newRound
+leadTrick :: RoundState -> HeartsIO RoundState
+leadTrick rs = do
+  rs' <- progressRound validLeadTrick rs
+  return $ rs' {
+    leadSuit = suit . head . M.elems $ pot rs'
   }
-  rs'' <- progressRound continueTrick rs'
-      >>= progressRound continueTrick
-      >>= progressRound continueTrick
-  return $ collectTrick rs''
+
+continueTrick :: RoundState -> HeartsIO RoundState
+continueTrick = progressRound validContinueTrick
+
+playTrick :: RoundState -> HeartsIO RoundState
+playTrick = leadTrick
+  >=> continueTrick
+  >=> continueTrick
+  >=> continueTrick
+  >=> return . collectTrick
 
 progressRound :: [PlayValidation] -> RoundState -> HeartsIO RoundState
 progressRound vs rs = do
   let p = toPlay rs
   c <- doPlayerIO p getSelectedCard (hands rs M.! p)
   let (First merr) = mconcat $ map (\v -> First $ v rs c) vs
-  let rs' = unsafePlayCard rs (toPlay rs) c
   case merr of
     Just err -> do
       doPlayerIO p receiveFeedback err
       progressRound vs rs
     Nothing  -> do
+      let rs' = unsafePlayCard rs (toPlay rs) c
       doEachPlayerIO_ showRoundState rs'
       return rs'
 
@@ -192,7 +203,7 @@ unsafePlayCard rs p c = rs {
   pot = M.insert p c (pot rs),
   hands = M.adjust (\\ [c]) p (hands rs),
   toPlay = nextPlayer p,
-  heartsBroken = heartsBroken rs || (suit c == Hearts)
+  heartsBroken = heartsBroken rs || suit c == Hearts
 }
 
 collectTrick :: RoundState -> RoundState
@@ -291,11 +302,11 @@ notPlayingPointCards rs c
   | not $ worthPoints c || all worthPoints (handToPlay rs) = Nothing
   | otherwise = Just "You can't play point cards on the first round!"
 
-leadTrick :: [PlayValidation]
-leadTrick = [hasCardInHand, notLeadingUnbrokenHearts]
+validLeadTrick :: [PlayValidation]
+validLeadTrick = [hasCardInHand, notLeadingUnbrokenHearts]
 
-continueTrick :: [PlayValidation]
-continueTrick = [hasCardInHand, playingLeadSuit]
+validContinueTrick :: [PlayValidation]
+validContinueTrick = [hasCardInHand, playingLeadSuit]
 
-continueFirstTrick :: [PlayValidation]
-continueFirstTrick = [hasCardInHand, playingLeadSuit, notPlayingPointCards]
+validContinueFirstTrick :: [PlayValidation]
+validContinueFirstTrick = [hasCardInHand, playingLeadSuit, notPlayingPointCards]
