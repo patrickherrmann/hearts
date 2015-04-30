@@ -26,7 +26,7 @@ newtype HeartsIO a = HeartsIO
   )
 
 type PMap a = M.Map Player a
-type PlayValidation = RoundState -> Card -> Maybe String
+type PlayValidation = RoundState -> Card -> Maybe MoveInfraction
 
 data GameIO = GameIO
   { playerIO          :: PMap PlayerIO
@@ -35,7 +35,7 @@ data GameIO = GameIO
 data PlayerIO = PlayerIO
   { getPassSelections :: [Card] -> IO (Card, Card, Card)
   , getSelectedCard   :: [Card] -> IO Card
-  , receiveFeedback   :: String -> IO ()
+  , receiveFeedback   :: MoveInfraction -> IO ()
   , showPreRound      :: GameState -> IO ()
   , showRoundState    :: RoundState -> IO ()
   , showPostGame      :: [Player] -> IO ()
@@ -54,6 +54,12 @@ data PassingPhase
   | PassAcross
   | Keep
   deriving (Show, Enum)
+
+data MoveInfraction
+  = CardNotInHand
+  | MustPlayLeadSuit
+  | HeartsNotBroken
+  | NoPointsFirstTrick
 
 data GameState = GameState
   { passingPhase :: PassingPhase
@@ -147,7 +153,9 @@ selectPasses p cs = do
   let ps = [a, b, c]
   if all (`elem` cs) ps
     then return (ps, cs \\ ps)
-    else selectPasses p cs
+    else do
+      doPlayerIO p receiveFeedback CardNotInHand
+      selectPasses p cs
 
 playTricks :: RoundState -> HeartsIO RoundState
 playTricks rs
@@ -289,22 +297,22 @@ gameOver = F.any (>= 100)
 hasCardInHand :: PlayValidation
 hasCardInHand rs c
   | c `elem` handToPlay rs = Nothing
-  | otherwise = Just "You can't play a card that's not in your hand!"
+  | otherwise = Just CardNotInHand
 
 playingLeadSuit :: PlayValidation
 playingLeadSuit rs c
   | suit c == leadSuit rs || all ((/= leadSuit rs) . suit) (handToPlay rs) = Nothing
-  | otherwise = Just "You have a card of the lead suit so you must play it!"
+  | otherwise = Just MustPlayLeadSuit
 
 notLeadingUnbrokenHearts :: PlayValidation
 notLeadingUnbrokenHearts rs c
   | heartsBroken rs || suit c /= Hearts || all ((== Hearts) . suit) (handToPlay rs) = Nothing
-  | otherwise = Just "You can't lead hearts until hearts have been broken!"
+  | otherwise = Just HeartsNotBroken
 
 notPlayingPointCards :: PlayValidation
 notPlayingPointCards rs c
   | not $ worthPoints c || all worthPoints (handToPlay rs) = Nothing
-  | otherwise = Just "You can't play point cards on the first round!"
+  | otherwise = Just NoPointsFirstTrick
 
 validLeadTrick :: [PlayValidation]
 validLeadTrick = [hasCardInHand, notLeadingUnbrokenHearts]

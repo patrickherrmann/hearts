@@ -63,6 +63,13 @@ promptThreeCards cs = do
       putStrLn "Invalid input..."
       promptThreeCards cs
 
+printMoveInfraction :: MoveInfraction -> IO ()
+printMoveInfraction mi = putStrLn $ message mi
+  where message CardNotInHand = "That card isn't in your hand!"
+        message MustPlayLeadSuit = "You have a card of the lead suit, so you must play it"
+        message HeartsNotBroken = "You can't lead hearts until hearts are broken!"
+        message NoPointsFirstTrick = "You can't play pounts on the first trick of the round!"
+
 main :: IO ()
 main = do
   let randomPlayer = PlayerIO {
@@ -76,7 +83,7 @@ main = do
   let humanPlayer = PlayerIO {
     getPassSelections = promptThreeCards,
     getSelectedCard = promptCard,
-    receiveFeedback = putStrLn,
+    receiveFeedback = printMoveInfraction,
     showPreRound = printPreRound,
     showRoundState = printRoundState,
     showPostGame = printPostGame
