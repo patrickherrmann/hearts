@@ -294,7 +294,7 @@ playingLeadSuit rs c
 
 notLeadingUnbrokenHearts :: PlayValidation
 notLeadingUnbrokenHearts rs c
-  | suit c /= Hearts || all ((== Hearts) . suit) (handToPlay rs) = Nothing
+  | heartsBroken rs || suit c /= Hearts || all ((== Hearts) . suit) (handToPlay rs) = Nothing
   | otherwise = Just "You can't lead hearts until hearts have been broken!"
 
 notPlayingPointCards :: PlayValidation
