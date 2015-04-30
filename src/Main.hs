@@ -16,7 +16,7 @@ printPreRound gs = do
 printRoundState :: RoundState -> IO ()
 printRoundState rs = do
     putStrLn "\nTrick:"
-    showPMap (pot rs) shorthand
+    showPMap (pot rs) show
 
 printPostGame :: [Player] -> IO ()
 printPostGame = putStrLn . gameOverText
