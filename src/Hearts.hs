@@ -56,8 +56,8 @@ data PassingPhase
   deriving (Show, Enum)
 
 data MoveInfraction
-  = CardNotInHand
-  | MustPlayLeadSuit
+  = CardNotInHand Card
+  | MustPlayLeadSuit Suit
   | HeartsNotBroken
   | NoPointsFirstTrick
 
@@ -149,12 +149,16 @@ performPassing phase hs = do
 
 selectPasses :: Player -> [Card] -> HeartsIO ([Card], [Card])
 selectPasses p cs = do
-  (a, b, c) <- doPlayerIO p getPassSelections cs
-  let ps = [a, b, c]
-  if all (`elem` cs) ps
-    then return (ps, cs \\ ps)
-    else do
-      doPlayerIO p receiveFeedback CardNotInHand
+  (x, y, z) <- doPlayerIO p getPassSelections cs
+  let ps = [x, y, z]
+  let cardInHand c
+        | c `notElem` cs = Just $ CardNotInHand c
+        | otherwise = Nothing
+  let (First mErr) = mconcat $ map (First . cardInHand) ps
+  case mErr of
+    Nothing -> return (ps, cs \\ ps)
+    Just err -> do
+      doPlayerIO p receiveFeedback err
       selectPasses p cs
 
 playTricks :: RoundState -> HeartsIO RoundState
@@ -202,8 +206,8 @@ progressRound :: [PlayValidation] -> RoundState -> HeartsIO RoundState
 progressRound vs rs = do
   let p = toPlay rs
   c <- doPlayerIO p getSelectedCard (hands rs M.! p)
-  let (First merr) = mconcat $ map (\v -> First $ v rs c) vs
-  case merr of
+  let (First mErr) = mconcat $ map (\v -> First $ v rs c) vs
+  case mErr of
     Just err -> do
       doPlayerIO p receiveFeedback err
       progressRound vs rs
@@ -297,12 +301,13 @@ gameOver = F.any (>= 100)
 hasCardInHand :: PlayValidation
 hasCardInHand rs c
   | c `elem` handToPlay rs = Nothing
-  | otherwise = Just CardNotInHand
+  | otherwise = Just $ CardNotInHand c
 
 playingLeadSuit :: PlayValidation
 playingLeadSuit rs c
-  | suit c == leadSuit rs || all ((/= leadSuit rs) . suit) (handToPlay rs) = Nothing
-  | otherwise = Just MustPlayLeadSuit
+  | suit c == ls || all ((/= ls) . suit) (handToPlay rs) = Nothing
+  | otherwise = Just $ MustPlayLeadSuit ls
+  where ls = leadSuit rs
 
 notLeadingUnbrokenHearts :: PlayValidation
 notLeadingUnbrokenHearts rs c

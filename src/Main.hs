@@ -65,8 +65,8 @@ promptThreeCards cs = do
 
 printMoveInfraction :: MoveInfraction -> IO ()
 printMoveInfraction mi = putStrLn $ message mi
-  where message CardNotInHand = "That card isn't in your hand!"
-        message MustPlayLeadSuit = "You have a card of the lead suit, so you must play it"
+  where message (CardNotInHand c) = show c ++ " isn't in your hand!"
+        message (MustPlayLeadSuit s) = "You must play a card of the lead suit " ++ show s ++ "!"
         message HeartsNotBroken = "You can't lead hearts until hearts are broken!"
         message NoPointsFirstTrick = "You can't play pounts on the first trick of the round!"
 
