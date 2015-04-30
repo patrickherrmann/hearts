@@ -18,10 +18,10 @@ printPreRound gs = do
     putStrLn "\nScores: -------------"
     showPMap (M.assocs $ scores gs) show
 
-printRoundState :: RoundState -> IO ()
-printRoundState rs = do
+printRoundState :: RoundStateView -> IO ()
+printRoundState rsv = do
     putStrLn "\nTrick:"
-    showPMap (pot rs) show
+    showPMap (potView rsv) show
 
 printPostGame :: [Player] -> IO ()
 printPostGame = putStrLn . gameOverText
@@ -35,8 +35,8 @@ gameOverText _ = "Everybody ties!"
 firstThreeCards :: [Card] -> IO (Card, Card, Card)
 firstThreeCards (a:b:c:_) = return (a, b, c)
 
-randomCardSelection :: [Card] -> IO Card
-randomCardSelection = sample . randomElement
+randomCardSelection :: RoundStateView -> IO Card
+randomCardSelection = sample . randomElement . handView
 
 showHand :: [Card] -> IO ()
 showHand cs = do
@@ -44,12 +44,13 @@ showHand cs = do
   putStrLn "Your hand:"
   putStrLn . unwords $ map show sorted
 
-promptCard :: [Card] -> IO Card
-promptCard cs = do
+promptCard :: RoundStateView -> IO Card
+promptCard rsv = do
+  let cs = handView rsv
   showHand cs
   putStr "Enter a card to play: " >> hFlush stdout
   input <- getLine
-  let parseError = putStrLn "Not a card!" >> promptCard cs
+  let parseError = putStrLn "Not a card!" >> promptCard rsv
   maybe parseError return (readCard input)
 
 promptThreeCards :: [Card] -> IO (Card, Card, Card)

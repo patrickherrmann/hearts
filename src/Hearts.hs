@@ -34,10 +34,10 @@ data GameIO = GameIO
 
 data PlayerIO = PlayerIO
   { getPassSelections :: [Card] -> IO (Card, Card, Card)
-  , getSelectedCard   :: [Card] -> IO Card
+  , getSelectedCard   :: RoundStateView -> IO Card
   , receiveFeedback   :: MoveInfraction -> IO ()
   , showPreRound      :: GameState -> IO ()
-  , showRoundState    :: RoundState -> IO ()
+  , showRoundState    :: RoundStateView -> IO ()
   , showPostGame      :: [Player] -> IO ()
   }
 
@@ -93,10 +93,11 @@ doPlayerIO p f a = do
   pio <- (M.! p) <$> asks playerIO
   liftIO $ f pio a
 
-doEachPlayerIO_ :: (PlayerIO -> a -> IO b) -> a -> HeartsIO ()
-doEachPlayerIO_ f a = do
-  pios <- M.elems <$> asks playerIO
-  liftIO $ mapM_ (`f` a) pios
+doEachPlayerIO_ :: (PlayerIO -> a -> IO b) -> (Player -> a) -> HeartsIO ()
+doEachPlayerIO_ f fa = do
+  pios <- M.assocs <$> asks playerIO
+  let res (p, pio) = f pio (fa p)
+  liftIO $ mapM_ res pios
 
 playGame :: GameIO -> IO ()
 playGame gio =  runHeartsWith gio $ playRounds initialGameState
@@ -104,11 +105,11 @@ playGame gio =  runHeartsWith gio $ playRounds initialGameState
 playRounds :: GameState -> HeartsIO ()
 playRounds gs
   | gameOver (scores gs) = do
-    doEachPlayerIO_ showPreRound gs
+    doEachPlayerIO_ showPreRound (const gs)
     let ws = winners $ scores gs
-    doEachPlayerIO_ showPostGame ws
+    doEachPlayerIO_ showPostGame (const ws)
   | otherwise = do
-    doEachPlayerIO_ showPreRound gs
+    doEachPlayerIO_ showPreRound (const gs)
     playRound gs >>= playRounds
 
 initialGameState :: GameState
@@ -169,7 +170,7 @@ playTricks rs
 leadFirstTrick :: RoundState -> HeartsIO RoundState
 leadFirstTrick rs = do
   let rs' = unsafePlayCard rs (toPlay rs) (Card Two Clubs)
-  doEachPlayerIO_ showRoundState rs'
+  doEachPlayerIO_ showRoundState (getRoundStateView rs')
   return rs'
 
 continueFirstTrick :: RoundState -> HeartsIO RoundState
@@ -181,9 +182,6 @@ playFirstTrick = leadFirstTrick
   >=> continueFirstTrick
   >=> continueFirstTrick
   >=> return . collectTrick
-
-selectPlay :: Player -> [Card] -> HeartsIO Card
-selectPlay p = doPlayerIO p getSelectedCard
 
 leadTrick :: RoundState -> HeartsIO RoundState
 leadTrick rs = do
@@ -205,7 +203,7 @@ playTrick = leadTrick
 progressRound :: [PlayValidation] -> RoundState -> HeartsIO RoundState
 progressRound vs rs = do
   let p = toPlay rs
-  c <- doPlayerIO p getSelectedCard (hands rs M.! p)
+  c <- doPlayerIO p getSelectedCard (getRoundStateView rs p)
   let (First mErr) = mconcat $ map (\v -> First $ v rs c) vs
   case mErr of
     Just err -> do
@@ -213,7 +211,7 @@ progressRound vs rs = do
       progressRound vs rs
     Nothing  -> do
       let rs' = unsafePlayCard rs (toPlay rs) c
-      doEachPlayerIO_ showRoundState rs'
+      doEachPlayerIO_ showRoundState (getRoundStateView rs')
       return rs'
 
 unsafePlayCard :: RoundState -> Player -> Card -> RoundState
@@ -222,6 +220,12 @@ unsafePlayCard rs p c = rs {
   hands = M.adjust (\\ [c]) p (hands rs),
   toPlay = nextPlayer p,
   heartsBroken = heartsBroken rs || suit c == Hearts
+}
+
+getRoundStateView :: RoundState -> Player -> RoundStateView
+getRoundStateView rs p = RoundStateView {
+  handView = hands rs M.! p,
+  potView = pot rs
 }
 
 collectTrick :: RoundState -> RoundState
