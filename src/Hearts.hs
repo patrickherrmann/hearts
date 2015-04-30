@@ -26,6 +26,7 @@ newtype HeartsIO a = HeartsIO
   )
 
 type PMap a = M.Map Player a
+type PlayValidation = RoundState -> Card -> Maybe String
 
 data GameIO = GameIO
   { playerIO          :: PMap PlayerIO
@@ -64,9 +65,14 @@ data RoundState = RoundState
   , leadSuit     :: Suit
   , hands        :: PMap [Card]
   , piles        :: PMap [Card]
-  , pot          :: PMap Card
+  , pot          :: [(Player, Card)]
   , heartsBroken :: Bool
   } deriving (Show)
+
+data RoundStateView = RoundStateView
+  { handView :: [Card]
+  , potView :: [(Player, Card)]
+  }
 
 runHeartsWith :: GameIO -> HeartsIO a -> IO a
 runHeartsWith gio = flip runReaderT gio . runHearts
@@ -122,7 +128,7 @@ initialRoundState hs = RoundState {
   leadSuit = Clubs,
   hands = hs,
   piles = M.fromList . zip players $ repeat [],
-  pot = M.empty,
+  pot = [],
   heartsBroken = False
 }
 
@@ -171,7 +177,7 @@ leadTrick :: RoundState -> HeartsIO RoundState
 leadTrick rs = do
   rs' <- progressRound validLeadTrick rs
   return $ rs' {
-    leadSuit = suit . head . M.elems $ pot rs'
+    leadSuit = suit . snd . head $ pot rs'
   }
 
 continueTrick :: RoundState -> HeartsIO RoundState
@@ -200,7 +206,7 @@ progressRound vs rs = do
 
 unsafePlayCard :: RoundState -> Player -> Card -> RoundState
 unsafePlayCard rs p c = rs {
-  pot = M.insert p c (pot rs),
+  pot = (p, c) : (pot rs),
   hands = M.adjust (\\ [c]) p (hands rs),
   toPlay = nextPlayer p,
   heartsBroken = heartsBroken rs || suit c == Hearts
@@ -209,8 +215,8 @@ unsafePlayCard rs p c = rs {
 collectTrick :: RoundState -> RoundState
 collectTrick rs = rs {
     toPlay = w,
-    pot = M.empty,
-    piles = M.adjust (++ M.elems (pot rs)) w (piles rs)
+    pot = [],
+    piles = M.adjust (++ map snd (pot rs)) w (piles rs)
   }
   where w = trickWinner rs
 
@@ -218,7 +224,7 @@ trickWinner :: RoundState -> Player
 trickWinner rs = fst
                . maximumBy (comparing (rank . snd))
                . filter ((== leadSuit rs) . suit . snd)
-               $ M.assocs (pot rs)
+               $ pot rs
 
 passingTarget :: PassingPhase -> Player -> Player
 passingTarget Keep = id
@@ -279,8 +285,6 @@ winners = map fst
 
 gameOver :: PMap Int -> Bool
 gameOver = F.any (>= 100)
-
-type PlayValidation = RoundState -> Card -> Maybe String
 
 hasCardInHand :: PlayValidation
 hasCardInHand rs c

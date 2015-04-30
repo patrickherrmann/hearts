@@ -9,14 +9,14 @@ import System.IO
 import Data.Ord
 import Data.Monoid
 
-showPMap :: PMap a -> (a -> String) -> IO ()
-showPMap pmap toS = mapM_ (putStrLn . showP) $ M.assocs pmap
+showPMap :: [(Player, a)] -> (a -> String) -> IO ()
+showPMap pmap toS = mapM_ (putStrLn . showP) pmap
     where showP (p, a) = show p ++ ": " ++ toS a
 
 printPreRound :: GameState -> IO ()
 printPreRound gs = do
     putStrLn "\nScores: -------------"
-    showPMap (scores gs) show
+    showPMap (M.assocs $ scores gs) show
 
 printRoundState :: RoundState -> IO ()
 printRoundState rs = do
