@@ -84,7 +84,7 @@ doPlayerIO p f a = do
 doEachPlayerIO_ :: (PlayerIO -> a -> IO b) -> a -> HeartsIO ()
 doEachPlayerIO_ f a = do
   pios <- M.elems <$> asks playerIO
-  liftIO $ mapM_ (flip f a) pios
+  liftIO $ mapM_ (`f` a) pios
 
 playGame :: GameIO -> IO ()
 playGame gio =  runHeartsWith gio $ playRounds initialGameState
@@ -165,7 +165,7 @@ playFirstTrick = leadFirstTrick
   >=> return . collectTrick
 
 selectPlay :: Player -> [Card] -> HeartsIO Card
-selectPlay p hand = doPlayerIO p getSelectedCard hand
+selectPlay p = doPlayerIO p getSelectedCard
 
 leadTrick :: RoundState -> HeartsIO RoundState
 leadTrick rs = do

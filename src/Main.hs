@@ -42,7 +42,7 @@ showHand :: [Card] -> IO ()
 showHand cs = do
   let sorted = sortBy (comparing suit <> comparing rank) cs
   putStrLn "Your hand:"
-  putStrLn . intercalate " " $ map show sorted
+  putStrLn . unwords $ map show sorted
 
 promptCard :: [Card] -> IO Card
 promptCard cs = do
