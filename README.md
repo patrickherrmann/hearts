@@ -13,7 +13,7 @@ $ cabal build
 Some sample play with one human player against three random players:
 
 ```
-$ ./dist/build/hearts/hearts
+$ ./dist/build/hearts-cli/hearts-cli
 
 Scores: -------------
 N: 0
