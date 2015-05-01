@@ -38,16 +38,16 @@ type PMap a = M.Map Player a
 type PlayValidation = RoundState -> Card -> Maybe MoveInfraction
 
 data GameIO = GameIO
-  { playerIO          :: PMap PlayerIO
+  { playerIO              :: PMap PlayerIO
   }
 
 data PlayerIO = PlayerIO
-  { getPassSelections :: [Card] -> IO (Card, Card, Card)
-  , getSelectedCard   :: RoundStateView -> IO Card
-  , receiveFeedback   :: MoveInfraction -> IO ()
-  , showPreRound      :: GameState -> IO ()
-  , showRoundState    :: RoundStateView -> IO ()
-  , showPostGame      :: [Player] -> IO ()
+  { choosePassSelections  :: [Card] -> IO (Card, Card, Card)
+  , chooseCard            :: RoundStateView -> IO Card
+  , showMoveInfraction    :: MoveInfraction -> IO ()
+  , showGameState         :: GameState -> IO ()
+  , showRoundState        :: RoundStateView -> IO ()
+  , showWinners           :: [Player] -> IO ()
   }
 
 data Player
@@ -109,11 +109,11 @@ playGame gio =  runHeartsWith gio $ playRounds initialGameState
 playRounds :: GameState -> HeartsIO ()
 playRounds gs
   | gameOver (scores gs) = do
-    doEachPlayerIO_ showPreRound (const gs)
+    doEachPlayerIO_ showGameState (const gs)
     let ws = winners $ scores gs
-    doEachPlayerIO_ showPostGame (const ws)
+    doEachPlayerIO_ showWinners (const ws)
   | otherwise = do
-    doEachPlayerIO_ showPreRound (const gs)
+    doEachPlayerIO_ showGameState (const gs)
     playRound gs >>= playRounds
 
 initialGameState :: GameState
@@ -154,7 +154,7 @@ performPassing phase hs = do
 
 selectPasses :: Player -> [Card] -> HeartsIO ([Card], [Card])
 selectPasses p cs = do
-  (x, y, z) <- doPlayerIO p getPassSelections cs
+  (x, y, z) <- doPlayerIO p choosePassSelections cs
   let ps = [x, y, z]
   let cardInHand c
         | c `notElem` cs = Just $ CardNotInHand c
@@ -163,7 +163,7 @@ selectPasses p cs = do
   case mErr of
     Nothing -> return (ps, cs \\ ps)
     Just err -> do
-      doPlayerIO p receiveFeedback err
+      doPlayerIO p showMoveInfraction err
       selectPasses p cs
 
 playTricks :: RoundState -> HeartsIO RoundState
@@ -207,11 +207,11 @@ playTrick = leadTrick
 progressRound :: [PlayValidation] -> RoundState -> HeartsIO RoundState
 progressRound vs rs = do
   let p = toPlay rs
-  c <- doPlayerIO p getSelectedCard (getRoundStateView rs p)
+  c <- doPlayerIO p chooseCard (getRoundStateView rs p)
   let (First mErr) = mconcat $ map (\v -> First $ v rs c) vs
   case mErr of
     Just err -> do
-      doPlayerIO p receiveFeedback err
+      doPlayerIO p showMoveInfraction err
       progressRound vs rs
     Nothing  -> do
       let rs' = unsafePlayCard rs (toPlay rs) c

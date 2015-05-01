@@ -8,13 +8,14 @@ import Control.Applicative
 import System.IO
 import Data.Ord
 import Data.Monoid
+import Control.Monad
 
 showPMap :: [(Player, a)] -> (a -> String) -> IO ()
 showPMap pmap toS = mapM_ (putStrLn . showP) pmap
     where showP (p, a) = show p ++ ": " ++ toS a
 
-printPreRound :: GameState -> IO ()
-printPreRound gs = do
+showScoreboard :: GameState -> IO ()
+showScoreboard gs = do
     putStrLn "\nScores: -------------"
     showPMap (M.assocs $ scores gs) show
 
@@ -74,20 +75,20 @@ printMoveInfraction mi = putStrLn $ message mi
 main :: IO ()
 main = do
   let randomPlayer = PlayerIO {
-    getPassSelections = firstThreeCards,
-    getSelectedCard = randomCardSelection,
-    receiveFeedback = const $ return (),
-    showPreRound = const $ return (),
-    showRoundState = const $ return (),
-    showPostGame = const $ return ()
+    choosePassSelections = firstThreeCards,
+    chooseCard = randomCardSelection,
+    showMoveInfraction = void . return,
+    showGameState = void . return,
+    showRoundState = void . return,
+    showWinners = void . return
   }
   let humanPlayer = PlayerIO {
-    getPassSelections = promptThreeCards,
-    getSelectedCard = promptCard,
-    receiveFeedback = printMoveInfraction,
-    showPreRound = printPreRound,
+    choosePassSelections = promptThreeCards,
+    chooseCard = promptCard,
+    showMoveInfraction = printMoveInfraction,
+    showGameState = showScoreboard,
     showRoundState = printRoundState,
-    showPostGame = printPostGame
+    showWinners = printPostGame
   }
   let piomap = M.fromList
         [ (N, humanPlayer)
