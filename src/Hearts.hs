@@ -89,6 +89,9 @@ data RoundStateView = RoundStateView
   , potView :: [(Player, Card)]
   }
 
+playGame :: GameIO -> IO ()
+playGame gio = runHeartsWith gio entireGame
+
 runHeartsWith :: GameIO -> HeartsIO a -> IO a
 runHeartsWith gio = flip runReaderT gio . runHearts
 
@@ -103,18 +106,18 @@ doEachPlayerIO_ f fa = do
   let res (p, pio) = f pio (fa p)
   liftIO $ mapM_ res pios
 
-playGame :: GameIO -> IO ()
-playGame gio =  runHeartsWith gio $ playRounds initialGameState
+entireGame :: HeartsIO ()
+entireGame = do
+  let gs = initialGameState
+  doEachPlayerIO_ showGameState (const gs)
+  gs' <- playRounds gs
+  let ws = winners $ scores gs'
+  doEachPlayerIO_ showWinners (const ws)
 
-playRounds :: GameState -> HeartsIO ()
+playRounds :: GameState -> HeartsIO GameState
 playRounds gs
-  | gameOver (scores gs) = do
-    doEachPlayerIO_ showGameState (const gs)
-    let ws = winners $ scores gs
-    doEachPlayerIO_ showWinners (const ws)
-  | otherwise = do
-    doEachPlayerIO_ showGameState (const gs)
-    playRound gs >>= playRounds
+  | gameOver (scores gs) = return gs
+  | otherwise = playRound gs >>= playRounds
 
 initialGameState :: GameState
 initialGameState = GameState {
@@ -128,10 +131,12 @@ playRound gs = do
   let hs = deal deck
   hs' <- performPassing (passingPhase gs) hs
   rs <- playFirstTrick (initialRoundState hs') >>= playTricks
-  return GameState {
+  let gs' = GameState {
     passingPhase = nextPassingPhase $ passingPhase gs,
     scores = M.unionWith (+) (scores gs) (scoreRound $ piles rs)
   }
+  doEachPlayerIO_ showGameState (const gs')
+  return gs'
 
 initialRoundState :: PMap [Card] -> RoundState
 initialRoundState hs = RoundState {
@@ -220,7 +225,7 @@ progressRound vs rs = do
 
 unsafePlayCard :: RoundState -> Player -> Card -> RoundState
 unsafePlayCard rs p c = rs {
-  pot = (p, c) : (pot rs),
+  pot = (p, c) : pot rs,
   hands = M.adjust (\\ [c]) p (hands rs),
   toPlay = nextPlayer p,
   heartsBroken = heartsBroken rs || suit c == Hearts
