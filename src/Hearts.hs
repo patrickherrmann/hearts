@@ -35,8 +35,7 @@ newtype HeartsIO a = HeartsIO
   )
 
 type PMap a = M.Map Player a
-type PlayValidation = RoundState -> Card -> Maybe MoveInfraction
-
+type Validator = RoundState -> Card -> Maybe MoveInfraction
 data GameIO = GameIO
   { playerIO              :: PMap PlayerIO
   }
@@ -207,15 +206,15 @@ playTrick = leadTrick
   >=> continueTrick
   >=> return . collectTrick
 
-progressRound :: PlayValidation -> RoundState -> HeartsIO RoundState
-progressRound validate rs = do
+progressRound :: Validator -> RoundState -> HeartsIO RoundState
+progressRound vf rs = do
   let p = toPlay rs
   c <- doPlayerIO p chooseCard (getRoundStateView rs p)
-  let mErr = validate rs c
+  let mErr = vf rs c
   case mErr of
     Just err -> do
       doPlayerIO p showMoveInfraction err
-      progressRound validate rs
+      progressRound vf rs
     Nothing  -> do
       let rs' = unsafePlayCard rs (toPlay rs) c
       doEachPlayerIO_ showRoundState (getRoundStateView rs')
@@ -309,35 +308,36 @@ winners = map fst
 gameOver :: PMap Int -> Bool
 gameOver = F.any (>= 100)
 
-(<||>) :: PlayValidation -> PlayValidation -> PlayValidation
-a <||> b = \rs c -> a rs c <|> b rs c
-
-hasCardInHand :: PlayValidation
+hasCardInHand :: Validator
 hasCardInHand rs c
   | c `elem` handToPlay rs = Nothing
   | otherwise = Just $ CardNotInHand c
 
-playingLeadSuit :: PlayValidation
+playingLeadSuit :: Validator
 playingLeadSuit rs c
   | suit c == ls || all ((/= ls) . suit) (handToPlay rs) = Nothing
   | otherwise = Just $ MustPlayLeadSuit ls
   where ls = leadSuit rs
 
-notLeadingUnbrokenHearts :: PlayValidation
+notLeadingUnbrokenHearts :: Validator
 notLeadingUnbrokenHearts rs c
   | heartsBroken rs || suit c /= Hearts || all ((== Hearts) . suit) (handToPlay rs) = Nothing
   | otherwise = Just HeartsNotBroken
 
-notPlayingPointCards :: PlayValidation
+notPlayingPointCards :: Validator
 notPlayingPointCards rs c
   | not $ worthPoints c || all worthPoints (handToPlay rs) = Nothing
   | otherwise = Just NoPointsFirstTrick
 
-validLeadTrick :: PlayValidation
-validLeadTrick = hasCardInHand <||> notLeadingUnbrokenHearts
+validLeadTrick :: Validator
+validLeadTrick rs c = hasCardInHand rs c
+                  <|> notLeadingUnbrokenHearts rs c
 
-validContinueTrick :: PlayValidation
-validContinueTrick = hasCardInHand <||> playingLeadSuit
+validContinueTrick :: Validator
+validContinueTrick rs c = hasCardInHand rs c
+                      <|> playingLeadSuit rs c
 
-validContinueFirstTrick :: PlayValidation
-validContinueFirstTrick = hasCardInHand <||> playingLeadSuit <||> notPlayingPointCards
+validContinueFirstTrick :: Validator
+validContinueFirstTrick rs c = hasCardInHand rs c
+                           <|> playingLeadSuit rs c
+                           <|> notPlayingPointCards rs c
