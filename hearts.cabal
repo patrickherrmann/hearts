@@ -17,6 +17,7 @@ source-repository head
   location:          https://github.com/patrickherrmann/hearts.git
 
 library
+  default-language:    Haskell2010
   hs-source-dirs:      src
   exposed-modules:     Hearts
                        Cards
@@ -25,13 +26,12 @@ library
                        split,
                        random-fu,
                        mtl
-  default-language:    Haskell2010
 
 executable hearts-cli
+  default-language:    Haskell2010
   hs-source-dirs:      cli
   main-is:             Main.hs
   build-depends:       base == 4.*,
                        hearts,
                        containers,
                        random-fu
-  default-language:    Haskell2010
