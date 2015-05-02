@@ -1,4 +1,6 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE TypeSynonymInstances #-}
 
 module Hearts
   ( GameIO(..)
@@ -36,6 +38,11 @@ newtype HeartsIO a = HeartsIO
 
 type PMap a = M.Map Player a
 type Validator = RoundState -> Card -> Maybe MoveInfraction
+
+instance Monoid Validator where
+  mempty = \rs c -> Nothing
+  a `mappend` b = \rs c -> a rs c <|> a rs c
+
 data GameIO = GameIO
   { playerIO              :: PMap PlayerIO
   }
@@ -308,6 +315,9 @@ winners = map fst
 gameOver :: PMap Int -> Bool
 gameOver = F.any (>= 100)
 
+(<||>) :: Validator -> Validator -> Validator
+a <||> b = \rs c -> a rs c <|> a rs c
+
 hasCardInHand :: Validator
 hasCardInHand rs c
   | c `elem` handToPlay rs = Nothing
@@ -330,14 +340,10 @@ notPlayingPointCards rs c
   | otherwise = Just NoPointsFirstTrick
 
 validLeadTrick :: Validator
-validLeadTrick rs c = hasCardInHand rs c
-                  <|> notLeadingUnbrokenHearts rs c
+validLeadTrick = hasCardInHand <||> notLeadingUnbrokenHearts
 
 validContinueTrick :: Validator
-validContinueTrick rs c = hasCardInHand rs c
-                      <|> playingLeadSuit rs c
+validContinueTrick = hasCardInHand <||> playingLeadSuit
 
 validContinueFirstTrick :: Validator
-validContinueFirstTrick rs c = hasCardInHand rs c
-                           <|> playingLeadSuit rs c
-                           <|> notPlayingPointCards rs c
+validContinueFirstTrick = hasCardInHand <||> playingLeadSuit <||> notPlayingPointCards
