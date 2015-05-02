@@ -1,6 +1,4 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
-{-# LANGUAGE FlexibleInstances #-}
-{-# LANGUAGE TypeSynonymInstances #-}
 
 module Hearts
   ( GameIO(..)
@@ -38,10 +36,6 @@ newtype HeartsIO a = HeartsIO
 
 type PMap a = M.Map Player a
 type Validator = RoundState -> Card -> Maybe MoveInfraction
-
-instance Monoid Validator where
-  mempty = \rs c -> Nothing
-  a `mappend` b = \rs c -> a rs c <|> a rs c
 
 data GameIO = GameIO
   { playerIO              :: PMap PlayerIO
