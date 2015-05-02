@@ -33,6 +33,5 @@ executable hearts-cli
   build-depends:       base == 4.*,
                        hearts,
                        containers,
-                       split,
                        random-fu
   default-language:    Haskell2010
