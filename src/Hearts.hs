@@ -164,12 +164,10 @@ selectPasses p cs = do
   let cardInHand c
         | c `notElem` cs = Just $ CardNotInHand c
         | otherwise = Nothing
-  let (First mErr) = mconcat $ map (First . cardInHand) ps
+  let mErr = cardInHand x <|> cardInHand y <|> cardInHand z
   case mErr of
     Nothing -> return (ps, cs \\ ps)
-    Just err -> do
-      doPlayerIO p showMoveInfraction err
-      selectPasses p cs
+    Just err -> doPlayerIO p showMoveInfraction err >> selectPasses p cs
 
 playTricks :: RoundState -> HeartsIO RoundState
 playTricks rs
@@ -209,15 +207,15 @@ playTrick = leadTrick
   >=> continueTrick
   >=> return . collectTrick
 
-progressRound :: [PlayValidation] -> RoundState -> HeartsIO RoundState
-progressRound vs rs = do
+progressRound :: PlayValidation -> RoundState -> HeartsIO RoundState
+progressRound validate rs = do
   let p = toPlay rs
   c <- doPlayerIO p chooseCard (getRoundStateView rs p)
-  let (First mErr) = mconcat $ map (\v -> First $ v rs c) vs
+  let mErr = validate rs c
   case mErr of
     Just err -> do
       doPlayerIO p showMoveInfraction err
-      progressRound vs rs
+      progressRound validate rs
     Nothing  -> do
       let rs' = unsafePlayCard rs (toPlay rs) c
       doEachPlayerIO_ showRoundState (getRoundStateView rs')
@@ -311,6 +309,9 @@ winners = map fst
 gameOver :: PMap Int -> Bool
 gameOver = F.any (>= 100)
 
+(<||>) :: PlayValidation -> PlayValidation -> PlayValidation
+a <||> b = \rs c -> a rs c <|> b rs c
+
 hasCardInHand :: PlayValidation
 hasCardInHand rs c
   | c `elem` handToPlay rs = Nothing
@@ -332,11 +333,11 @@ notPlayingPointCards rs c
   | not $ worthPoints c || all worthPoints (handToPlay rs) = Nothing
   | otherwise = Just NoPointsFirstTrick
 
-validLeadTrick :: [PlayValidation]
-validLeadTrick = [hasCardInHand, notLeadingUnbrokenHearts]
+validLeadTrick :: PlayValidation
+validLeadTrick = hasCardInHand <||> notLeadingUnbrokenHearts
 
-validContinueTrick :: [PlayValidation]
-validContinueTrick = [hasCardInHand, playingLeadSuit]
+validContinueTrick :: PlayValidation
+validContinueTrick = hasCardInHand <||> playingLeadSuit
 
-validContinueFirstTrick :: [PlayValidation]
-validContinueFirstTrick = [hasCardInHand, playingLeadSuit, notPlayingPointCards]
+validContinueFirstTrick :: PlayValidation
+validContinueFirstTrick = hasCardInHand <||> playingLeadSuit <||> notPlayingPointCards
