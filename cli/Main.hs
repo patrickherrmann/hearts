@@ -1,14 +1,13 @@
 import Cards
 import Hearts
+import Hearts.RandomPlayer
 import Text.Printf
 import qualified Data.Map as M
-import Data.Random
 import Data.List
 import Control.Applicative
 import System.IO
 import Data.Ord
 import Data.Monoid
-import Control.Monad
 
 showPMap :: [(Player, a)] -> (a -> String) -> IO ()
 showPMap pmap toS = mapM_ (putStrLn . showP) pmap
@@ -32,12 +31,6 @@ gameOverText [a] = printf "%s wins!" (show a)
 gameOverText [a, b] = printf "%s and %s tie." (show a) (show b)
 gameOverText [a, b, c] = printf "%s, %s, and %s tie." (show a) (show b) (show c)
 gameOverText _ = "Everybody ties!"
-
-firstThreeCards :: [Card] -> IO (Card, Card, Card)
-firstThreeCards (a:b:c:_) = return (a, b, c)
-
-randomCardSelection :: RoundStateView -> IO Card
-randomCardSelection = sample . randomElement . handView
 
 showHand :: [Card] -> IO ()
 showHand cs = do
@@ -74,14 +67,6 @@ printMoveInfraction mi = putStrLn $ message mi
 
 main :: IO ()
 main = do
-  let randomPlayer = PlayerIO {
-    choosePassSelections = firstThreeCards,
-    chooseCard = randomCardSelection,
-    showMoveInfraction = void . return,
-    showGameState = void . return,
-    showRoundState = void . return,
-    showWinners = void . return
-  }
   let humanPlayer = PlayerIO {
     choosePassSelections = promptThreeCards,
     chooseCard = promptCard,

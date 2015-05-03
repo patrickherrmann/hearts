@@ -15,7 +15,6 @@ import Data.List
 import Data.List.Split
 import Data.Ord
 import Cards
-import Data.Monoid
 import Control.Applicative
 import Data.Function
 import qualified Data.Map as M
@@ -310,7 +309,7 @@ gameOver :: PMap Int -> Bool
 gameOver = F.any (>= 100)
 
 (<||>) :: Validator -> Validator -> Validator
-a <||> b = \rs c -> a rs c <|> a rs c
+a <||> b = \rs c -> a rs c <|> b rs c
 
 hasCardInHand :: Validator
 hasCardInHand rs c
