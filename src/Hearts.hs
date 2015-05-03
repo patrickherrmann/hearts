@@ -1,4 +1,5 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE ViewPatterns #-}
 
 module Hearts
   ( GameIO(..)
@@ -41,7 +42,7 @@ data GameIO = GameIO
   }
 
 data PlayerIO = PlayerIO
-  { choosePassSelections  :: [Card] -> IO (Card, Card, Card)
+  { choosePassSelections  :: [Card] -> IO [Card]
   , chooseCard            :: RoundStateView -> IO Card
   , showMoveInfraction    :: MoveInfraction -> IO ()
   , showGameState         :: GameState -> IO ()
@@ -68,6 +69,7 @@ data MoveInfraction
   | MustPlayLeadSuit Suit
   | HeartsNotBroken
   | NoPointsFirstTrick
+  | MustPassExactlyThreeCards
 
 data GameState = GameState
   { passingPhase :: PassingPhase
@@ -158,13 +160,8 @@ performPassing phase hs = do
 
 selectPasses :: Player -> [Card] -> HeartsIO ([Card], [Card])
 selectPasses p cs = do
-  (x, y, z) <- doPlayerIO p choosePassSelections cs
-  let ps = [x, y, z]
-  let cardInHand c
-        | c `notElem` cs = Just $ CardNotInHand c
-        | otherwise = Nothing
-  let mErr = cardInHand x <|> cardInHand y <|> cardInHand z
-  case mErr of
+  ps <- doPlayerIO p choosePassSelections cs
+  case validPasses cs ps of
     Nothing -> return (ps, cs \\ ps)
     Just err -> doPlayerIO p showMoveInfraction err >> selectPasses p cs
 
@@ -311,10 +308,13 @@ gameOver = F.any (>= 100)
 (<||>) :: Validator -> Validator -> Validator
 a <||> b = \rs c -> a rs c <|> b rs c
 
-hasCardInHand :: Validator
-hasCardInHand rs c
-  | c `elem` handToPlay rs = Nothing
+cardInHand :: [Card] -> Card -> Maybe MoveInfraction
+cardInHand cs c
+  | c `elem` cs = Nothing
   | otherwise = Just $ CardNotInHand c
+
+hasCardInHand :: Validator
+hasCardInHand rs = cardInHand (handToPlay rs)
 
 playingLeadSuit :: Validator
 playingLeadSuit rs c
@@ -340,3 +340,7 @@ validContinueTrick = hasCardInHand <||> playingLeadSuit
 
 validContinueFirstTrick :: Validator
 validContinueFirstTrick = hasCardInHand <||> playingLeadSuit <||> notPlayingPointCards
+
+validPasses :: [Card] -> [Card] -> Maybe MoveInfraction
+validPasses cs (nub -> [x, y, z]) = cardInHand cs x <|> cardInHand cs y <|> cardInHand cs z
+validPasses _ _ = Just MustPassExactlyThreeCards

@@ -47,13 +47,13 @@ promptCard rsv = do
   let parseError = putStrLn "Not a card!" >> promptCard rsv
   maybe parseError return (readCard input)
 
-promptThreeCards :: [Card] -> IO (Card, Card, Card)
+promptThreeCards :: [Card] -> IO [Card]
 promptThreeCards cs = do
   showHand cs
   putStr "Enter three cards to pass: " >> hFlush stdout
   inputs <- words <$> getLine
   case map readCard inputs of
-    [Just a, Just b, Just c] -> return (a, b, c)
+    [Just a, Just b, Just c] -> return [a, b, c]
     _ -> do
       putStrLn "Invalid input..."
       promptThreeCards cs
@@ -64,6 +64,7 @@ printMoveInfraction mi = putStrLn $ message mi
         message (MustPlayLeadSuit s) = "You must play a card of the lead suit " ++ show s ++ "!"
         message HeartsNotBroken = "You can't lead hearts until hearts are broken!"
         message NoPointsFirstTrick = "You can't play pounts on the first trick of the round!"
+        message MustPassExactlyThreeCards = "You have must provide exactly three distinct cards to pass!"
 
 main :: IO ()
 main = do

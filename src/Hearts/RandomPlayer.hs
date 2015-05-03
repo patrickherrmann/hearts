@@ -7,8 +7,8 @@ import Hearts
 import Data.Random
 import Control.Monad
 
-firstThreeCards :: [Card] -> IO (Card, Card, Card)
-firstThreeCards (a:b:c:_) = return (a, b, c)
+firstThreeCards :: [Card] -> IO [Card]
+firstThreeCards = return . take 3
 
 randomCardSelection :: RoundStateView -> IO Card
 randomCardSelection = sample . randomElement . handView
