@@ -7,7 +7,6 @@ module Cards
   , readCard
   ) where
 
-import Control.Applicative
 import Data.List
 import Data.List.Split
 

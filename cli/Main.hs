@@ -4,7 +4,6 @@ import Hearts.RandomPlayer
 import Text.Printf
 import qualified Data.Map as M
 import Data.List
-import Control.Applicative
 import System.IO
 import Data.Ord
 import Data.Monoid
