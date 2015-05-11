@@ -19,8 +19,6 @@ import Cards
 import Control.Applicative
 import Data.Function
 import qualified Data.Map as M
-import qualified Data.Traversable as T
-import qualified Data.Foldable as F
 import Data.Random
 import Control.Monad.Reader
 
@@ -152,7 +150,7 @@ initialRoundState hs = RoundState {
 performPassing :: PassingPhase -> PMap [Card] -> HeartsIO (PMap [Card])
 performPassing Keep hs = return hs
 performPassing phase hs = do
-  selections <- T.sequence $ M.mapWithKey selectPasses hs
+  selections <- sequence $ M.mapWithKey selectPasses hs
   let passes = M.map fst selections
   let keeps = M.map snd selections
   let shifted = M.mapKeys (passingTarget phase) passes
@@ -283,14 +281,14 @@ worthPoints :: Card -> Bool
 worthPoints = (>0) . points
 
 roundOver :: RoundState -> Bool
-roundOver = F.any null . hands
+roundOver = any null . hands
 
 scoreRound :: PMap [Card] -> PMap Int
 scoreRound = adjustIfMoonShot . M.map (sum . map points)
 
 adjustIfMoonShot :: PMap Int -> PMap Int
 adjustIfMoonShot ss
-    | F.any (==26) ss = M.map newScore ss
+    | any (==26) ss = M.map newScore ss
     | otherwise = ss
   where newScore 26 = 0
         newScore _  = 26
@@ -303,7 +301,7 @@ winners = map fst
         . M.assocs
 
 gameOver :: PMap Int -> Bool
-gameOver = F.any (>= 100)
+gameOver = any (>= 100)
 
 (<||>) :: Validator -> Validator -> Validator
 a <||> b = \rs c -> a rs c <|> b rs c
